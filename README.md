@@ -1,8 +1,8 @@
 数据库层
 ===
 
-[![Build Status](https://travis-ci.com/lsys/db.svg?branch=next_version)](https://travis-ci.com/lsys/db)
-[![Coverage Status](https://coveralls.io/repos/github/lsys/db/badge.svg?branch=next_version)](https://coveralls.io/github/lsys/db?branch=next_version)
+[![Build Status](https://travis-ci.com/lsys/db.svg?branch=master)](https://travis-ci.com/lsys/db)
+[![Coverage Status](https://coveralls.io/repos/github/lsys/db/badge.svg?branch=master)](https://coveralls.io/github/lsys/db?branch=master)
 
 > 目的:使数据库层有统一封装,从而使数据库的调用保持一致的接口,如果需要更加自动化的数据库层的操作,请使用 [ https://github.com/lsys/orm ]
 
