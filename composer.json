@@ -1,0 +1,39 @@
+{
+	"name": "lsys/db",
+	"type" : "library",
+	"license": "Apache-2.0",
+	"version" : "1.0.0",
+	"description" : "lsys module db",
+	"autoload":{
+		"psr-4": {
+        	"LSYS\\" : "src/classes/LSYS/"
+		},
+		"files": ["src/Bootstarp.php"]
+    },
+    "require": {
+     	"php": ">=5.4",
+     	"lsys/i18n":"~1.0.0",
+     	"lsys/config":"~1.0.0"
+	},
+	"require-dev": {
+     	"lsys/profiler":"~1.0.0",
+     	"lsys/event":"~1.0.0",
+     	"lsys/db-mysqli":"~1.0.0",
+     	"lsys/db-rwcache-redis":"~1.0.0",
+     	"phpunit/phpunit" : "~7.1.5",
+     	"php-coveralls/php-coveralls":"~v2.0.0"
+	},
+	"suggest": {
+		"lsys/profiler":"~1.0.0",
+     	"lsys/event":"~1.0.0",
+		"lsys/db-pdo":"~1.0.0",
+		"lsys/db-mysqli":"~1.0.0",
+		"lsys/db-pdo-mysql":"~1.0.0",
+		"lsys/db-pdo-postgresql":"~1.0.0",
+		"lsys/db-pdo-sqlite":"~1.0.0",
+		"lsys/db-postgresql":"~1.0.0",
+		"lsys/db-rwcache-memcache":"~1.0.0",
+     	"lsys/db-rwcache-memcached":"~1.0.0",
+     	"lsys/db-rwcache-redis":"~1.0.0"
+    }
+}
