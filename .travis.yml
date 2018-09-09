@@ -1,0 +1,48 @@
+language: php
+services:
+  - mysql
+php:
+  - 7.1
+  
+before_install:
+  - sudo apt-get install redis-server
+  - sudo apt-get install memcached
+  - sudo apt-get install libmemcache-dev
+  - wget https://pecl.php.net/get/memcached-3.0.4.tgz 
+    && tar zfvx memcached-3.0.4.tgz 
+    && cd memcached-3.0.4 
+    && phpize
+    && ./configure --disable-memcached-sasl
+    && make
+    && sudo make install
+    && cd ..
+  - echo "extension=memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - git clone https://github.com/websupport-sk/pecl-memcache.git
+    && cd pecl-memcache
+    && phpize
+    && ./configure
+    && make
+    && sudo make install
+    && cd ..
+  - echo "extension=memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - wget https://pecl.php.net/get/redis-4.1.0.tgz
+    && tar zfvx redis-4.1.0.tgz
+    && cd redis-4.1.0
+    && phpize
+    && ./configure
+    && make
+    && sudo make install
+    && cd ..
+  - echo "extension=redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+  - sudo mysql -e "create database test;use test;CREATE TABLE IF NOT EXISTS l_order (id int(11) NOT NULL AUTO_INCREMENT,sn char(12) NOT NULL,title varchar(32) NOT NULL, add_time int(11) NOT NULL,PRIMARY KEY (id)) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;"
+  - sudo service mysql restart
+  
+before_script:
+  - composer install --dev
+  - cd tests
+script: 
+  - ../vendor/bin/phpunit -v
+after_script:
+  - cd ..
+  - travis_retry vendor/bin/php-coveralls -x tests/report/clover.xml -o tests/report/coveralls.json -v
