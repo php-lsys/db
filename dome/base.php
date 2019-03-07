@@ -13,12 +13,12 @@ $db =DI::get()->db("database.mysqli");
 
 
 //得到完整表名
-$table_name=$db->quote_table("order");
+$table_name=$db->quoteTable("order");
 //========================================基本使用========================================
 //得到用于SQL的值
 $value=$db->quote("SN001");
 //得到用户SQL的字段
-// $column=$db->quote_column("sn");
+// $column=$db->quoteColumn("sn");
 //------------------------------------查询---------------------------------------
 $sql="select * from {$table_name} where sn={$value}";
 $result= $db->query(Database::DQL, $sql);//DQL返回结果对象,其他返回布尔
@@ -38,9 +38,9 @@ $sql="insert into {$table_name} (sn,title,add_time) values ('SN001','".uniqid().
 $result=$db->query(Database::DML, $sql);
 if ($result){
 	//成功
-	echo $db->insert_id();//最后插入ID
+	echo $db->insertId();//最后插入ID
 	echo "\n";
-	echo $db->affected_rows();//插入行数
+	echo $db->affectedRows();//插入行数
 	echo "\n";
 }
 
@@ -50,7 +50,7 @@ $sql="update {$table_name} set title='update data' where id={$id}";
 $result=$db->query(Database::DML, $sql);
 if ($result){
 	//成功
-	echo $db->affected_rows();//影响行数
+	echo $db->affectedRows();//影响行数
 	echo "\n";
 }
 
@@ -60,7 +60,7 @@ $sql="delete from {$table_name} where id={$id}";
 $result=$db->query(Database::DML, $sql);
 if ($result){
 	//成功
-	echo $db->affected_rows();//影响行数
+	echo $db->affectedRows();//影响行数
 	echo "\n";
 }
 

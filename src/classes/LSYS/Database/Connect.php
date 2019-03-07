@@ -37,8 +37,8 @@ abstract class Connect {
 	 * get connect link
 	 * @param int $model
 	 */
-	abstract public function get_connect($allow_read);
-	abstract public function set_charset($charset);
+	abstract public function getConnect($allow_read);
+	abstract public function setCharset($charset);
 	/**
 	 * disconnect link
 	 */
@@ -48,7 +48,7 @@ abstract class Connect {
 	 * @param array $config_array
 	 * @return number[]
 	 */
-	protected function _array_weight_get(array $config_array){
+	protected function _arrayWeightGet(array $config_array){
 		$weight=0;
 		$wa=array();
 		$config_array=array_values($config_array);

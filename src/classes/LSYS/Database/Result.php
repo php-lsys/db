@@ -46,7 +46,7 @@ abstract class Result implements \Countable, \Iterator, \SeekableIterator, \Arra
 	 * @param string $classname
 	 * @param array $ctorargs
 	 */
-	public function set_fetch_mode ( $mode,$classname=NULL, array $ctorargs=NULL){
+	public function setFetchMode( $mode,$classname=NULL, array $ctorargs=NULL){
 		switch ($mode){
 			case \LSYS\Database::FETCH_ASSOC:
 				$this->_as_object=false;
@@ -89,19 +89,19 @@ abstract class Result implements \Countable, \Iterator, \SeekableIterator, \Arra
 	 * Return all of the rows in the result as an array.
 	 *
 	 *     // Indexed array of all rows
-	 *     $rows = $result->as_array();
+	 *     $rows = $result->asArray();
 	 *
 	 *     // Associative array of rows by "id"
-	 *     $rows = $result->as_array('id');
+	 *     $rows = $result->asArray('id');
 	 *
 	 *     // Associative array of rows, "id" => "name"
-	 *     $rows = $result->as_array('id', 'name');
+	 *     $rows = $result->asArray('id', 'name');
 	 *
 	 * @param   string  $key    column for associative keys
 	 * @param   string  $value  column for values
 	 * @return  array
 	 */
-	public function as_array($key = NULL, $value = NULL)
+	public function asArray($key = NULL, $value = NULL)
 	{
 		$results = array();
 

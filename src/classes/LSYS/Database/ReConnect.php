@@ -11,5 +11,5 @@ interface ReConnect{
 	 * return is retry connect
 	 * @param mixed $error_object error object
 	 */
-	public function is_reconnect($error_object);
+	public function isReconnect($error_object);
 }

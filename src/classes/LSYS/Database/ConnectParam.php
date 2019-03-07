@@ -23,7 +23,7 @@ class ConnectParam {
      * @param string $sql
      * @param RWCache $parse_cache
      */
-    public function set_query($type,$sql,RWCache $parse_cache=null){
+    public function setQuery($type,$sql,RWCache $parse_cache=null){
         $this->_parse_cache=$parse_cache;
         $this->_type=$type;
         $this->_sql=$sql;
@@ -32,7 +32,7 @@ class ConnectParam {
         }
         if($this->_model==Connect::MASTER_MODEL)return ;
         if(!$this->_parse_cache||$this->_parse_cache->cache()->delayed()<=0)return;
-        if($this->_parse_cache->cache()->time($this->_parse_cache->parse()->query_parse($sql))){
+        if($this->_parse_cache->cache()->time($this->_parse_cache->parse()->queryParse($sql))){
             $this->_model=Connect::MASTER_MODEL;
         }
     }
@@ -40,11 +40,11 @@ class ConnectParam {
      * 是否可以得到从库
      * @return boolean
      */
-    public function is_slave(){
+    public function isSlave(){
         return $this->_model==Connect::READ_MODEL;
     }
     public function save(){
         if(!$this->_parse_cache||$this->_parse_cache->cache()->delayed()<=0||!$this->_sql)return;
-        $this->_parse_cache->cache()->save($this->_parse_cache->parse()->exec_parse($this->_type,$this->_sql));
+        $this->_parse_cache->cache()->save($this->_parse_cache->parse()->execParse($this->_type,$this->_sql));
     }
 }

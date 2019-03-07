@@ -21,7 +21,7 @@ class Simple implements Parse {
     /**
      * @return array $table
      */
-    public function query_parse($sql){
+    public function queryParse($sql){
         $table=[];
         $sqls=preg_split('/\s|=|\(|\)|,|;/', trim($sql));
         switch (strtolower(array_shift($sqls))){
@@ -128,7 +128,7 @@ class Simple implements Parse {
     /**
      * @return array $table
      */
-    public function exec_parse($type,$sql){
+    public function execParse($type,$sql){
         if($type==Database::DQL)return [];
         $table=[];
         $sqls=preg_split('/\s|=|\(|\)|,/', trim($sql));

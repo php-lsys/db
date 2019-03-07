@@ -6,7 +6,7 @@ $db =DI::get()->db("database.mysqli");
 //$db = Database::factory(LSYS\Config\DI::get()->config("database.mysqli"));
 
 //得到完整表名
-$table_name=$db->quote_table("order");
+$table_name=$db->quoteTable("order");
 
 //为了防止SQL 注入,请劲量使用此方法进行数据库操作
 //对于MYSQLI 和 PDO 的预编译的接口做了统一,保持一致调用
@@ -19,7 +19,7 @@ $prepare->bindValue("sn",'SN001');
 //$prepare->bindValue(array("sn"=>"SN001"));
 $result=$prepare->execute();
 //$result 和 db->query 返回保持一致
-//$result->set_fetch_mode(Database::FETCH_OBJ);
+//$result->setFetchMode(Database::FETCH_OBJ);
 //直接拿结果
 $record=$result->current();//第一个结果
 if ($record===null){
@@ -41,9 +41,9 @@ $prepare->bindValue(array(
 ));
 if ($prepare->execute()){
 	//成功
-	echo $prepare->insert_id();//最后插入ID
+	echo $prepare->insertId();//最后插入ID
 	echo "\n";
-	echo $prepare->affected_rows();//插入行数
+	echo $prepare->affectedRows();//插入行数
 	echo "\n";
 }
 
@@ -56,7 +56,7 @@ $prepare->bindValue(array(
 ));
 if ($prepare->execute()){
 	//成功
-	echo $prepare->affected_rows();//影响行数
+	echo $prepare->affectedRows();//影响行数
 	echo "\n";
 }
 
@@ -68,7 +68,7 @@ $prepare->bindValue(array(
 ));
 if ($prepare->execute()){
 	//成功
-	echo $prepare->affected_rows();//影响行数
+	echo $prepare->affectedRows();//影响行数
 	echo "\n";
 }
 

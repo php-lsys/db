@@ -39,10 +39,10 @@ abstract class Prepare{
 	 * return last query affected rows
 	 * @return int
 	 */
-	abstract public function affected_rows();
+	abstract public function affectedRows();
 	/**
 	 * return last insert auto id
 	 * @return int
 	 */
-	abstract public function insert_id();
+	abstract public function insertId();
 }

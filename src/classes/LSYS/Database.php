@@ -139,10 +139,10 @@ abstract class Database implements \Serializable{
 	 * create connect param
 	 * @return \LSYS\Database\ConnectParam
 	 */
-	protected function _connect_param_create(){
+	protected function _connectParamCreate(){
 	    return new ConnectParam($this->_query_mode);
 	}
-	public function set_event_manager(\LSYS\EventManager $event_manager){
+	public function setEventManager(\LSYS\EventManager $event_manager){
 	    $this->_event_manager=$event_manager;
 	    return $this;
 	}
@@ -159,7 +159,7 @@ abstract class Database implements \Serializable{
 	 * set profiler
 	 * @param \LSYS\Profiler $profiler
 	 */
-	public function set_profiler(\LSYS\Profiler $profiler){
+	public function setProfiler(\LSYS\Profiler $profiler){
 	    $this->_profiler=$profiler;
 	}
 	/**
@@ -169,22 +169,22 @@ abstract class Database implements \Serializable{
 	 * @return void
 	 */
 	public function connect(){
-	    $queryparse=$this->_connect_param_create();
-	    $this->_connection->get_connect($queryparse->is_slave());
+	    $queryparse=$this->_connectParamCreate();
+	    $this->_connection->getConnect($queryparse->isSlave());
 		return true;
 	}
 	/**
 	 * return last query sql
 	 * @return string
 	 */
-	public function last_query(){
+	public function lastQuery(){
 		return $this->last_query;
 	}
 	/**
 	 * set query model
 	 * @param int
 	 */
-	public function set_query($query_mode){
+	public function setQuery($query_mode){
 		$this->_query_mode=$query_mode;
 		return $this;
 	}
@@ -238,7 +238,7 @@ abstract class Database implements \Serializable{
 	 * @uses Database::quote_identifier
 	 * @uses Database::table_prefix
 	 */
-	public function quote_column($column) {
+	public function quoteColumn($column) {
 		if(empty($column)) return '';
 		// Identifiers are escaped by repeating them
 		$escaped_identifier = $this->_identifier . $this->_identifier;
@@ -260,7 +260,7 @@ abstract class Database implements \Serializable{
 			} elseif (strpos ( $column, '.' ) !== FALSE) {
 				$parts = explode ( '.', $column );
 				
-				if ($prefix = $this->table_prefix ()) {
+				if ($prefix = $this->tablePrefix()) {
 					// Get the offset of the table name, 2nd-to-last part
 					$offset = count ( $parts ) - 2;
 					
@@ -315,13 +315,13 @@ abstract class Database implements \Serializable{
 	 * Return the table prefix defined in the current configuration.
 	 * @return  string
 	 */
-	public function table_prefix() {
+	public function tablePrefix() {
 		return $this->_config->get("table_prefix");
 	}
 	/**
 	 * @param string $table        	
 	 */
-	public function quote_table($table) {
+	public function quoteTable($table) {
 		// Identifiers are escaped by repeating them
 		$escaped_identifier = $this->_identifier . $this->_identifier;
 		
@@ -342,7 +342,7 @@ abstract class Database implements \Serializable{
 			if (strpos ( $table, '.' ) !== FALSE) {
 				$parts = explode ( '.', $table );
 				
-				if ($prefix = $this->table_prefix ()) {
+				if ($prefix = $this->tablePrefix()) {
 					// Get the offset of the table name, last part
 					$offset = count ( $parts ) - 1;
 					
@@ -358,13 +358,13 @@ abstract class Database implements \Serializable{
 				$table = implode ( '.', $parts );
 			} else {
 				// Add the table prefix
-				$table = $this->_identifier . $this->table_prefix () . $table . $this->_identifier;
+				$table = $this->_identifier . $this->tablePrefix() . $table . $this->_identifier;
 			}
 		}
 		
 		if (isset ( $alias )) {
 			// Attach table prefix to alias
-			$table .= ' AS ' . $this->_identifier.$this->table_prefix(). $alias . $this->_identifier;
+			$table .= ' AS ' . $this->_identifier.$this->tablePrefix(). $alias . $this->_identifier;
 		}
 		return $table;
 	}
@@ -372,12 +372,12 @@ abstract class Database implements \Serializable{
 	 * Extracts the text between parentheses, if any.
 	 *
 	 * // Returns: array('CHAR', '6')
-	 * list($type, $length) = $db->_parse_type('CHAR(6)');
+	 * list($type, $length) = $db->_parseType('CHAR(6)');
 	 *
 	 * @param string $type        	
 	 * @return array list containing the type and length, if any
 	 */
-	protected function _parse_type($type) {
+	protected function _parseType($type) {
 		if (($open = strpos ( $type, '(' )) === FALSE) {
 			// No length specified
 			return array (
@@ -731,7 +731,7 @@ abstract class Database implements \Serializable{
 	 *        	character set name
 	 * @return void
 	 */
-	abstract public function set_charset($charset);
+	abstract public function setCharset($charset);
 	/**
 	 * Lists all of the columns in a table.
 	 *
@@ -743,7 +743,7 @@ abstract class Database implements \Serializable{
 	 *        	column more data
 	 * @return array
 	 */
-	abstract public function list_columns($table, $like = NULL, $column_info = TRUE);
+	abstract public function listColumns($table, $like = NULL, $column_info = TRUE);
 	/**
 	 * Perform an SQL query of the given type.
 	 *
@@ -763,23 +763,23 @@ abstract class Database implements \Serializable{
 	 * return last query affected rows
 	 * @return int
 	 */
-	abstract public function affected_rows();
+	abstract public function affectedRows();
 	/**
 	 * return last insert auto id
 	 * @return int
 	 */
-	abstract public function insert_id();
+	abstract public function insertId();
 	/**
 	 * in transaction
 	 */
-	abstract public function in_transaction ();
+	abstract public function inTransaction();
 	/**
 	 * Start a SQL transaction
 	 * @param string $mode
 	 *        	transaction mode
 	 * @return boolean
 	 */
-	abstract public function begin_transaction ($mode = NULL);
+	abstract public function beginTransaction($mode = NULL);
 	
 	/**
 	 * Commit the current transaction
@@ -798,20 +798,20 @@ abstract class Database implements \Serializable{
 	 *        	table to search for
 	 * @return array
 	 */
-	abstract public function list_tables($like = NULL);
+	abstract public function listTables($like = NULL);
 	/**
 	 * set attribute
 	 * @param string $attr
 	 * @param mixed $value
 	 * @return bool
 	 */
-	abstract public function set_attr($attr, $value);
+	abstract public function setAttr($attr, $value);
 	/**
 	 * get attribute
 	 * @param string $attr
 	 * @return null
 	 */
-	abstract public function get_attr($attr);
+	abstract public function getAttr($attr);
 	/**
 	 * dump object
 	 */

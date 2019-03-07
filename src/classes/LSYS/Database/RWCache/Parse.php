@@ -11,10 +11,10 @@ interface Parse{
      * 解析查询的用到的表 只有查询会进
      * @return array $table
      */
-    public function query_parse($sql);
+    public function queryParse($sql);
     /**
      * 解析执行用到的表 查询也会进,部分数据库支持时查询更新
      * @return array $table
      */
-    public function exec_parse($type,$sql);
+    public function execParse($type,$sql);
 }

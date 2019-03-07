@@ -3,17 +3,17 @@ namespace LSYS\Config;
 use LSYS\DI;
 use LSYS\DI\MethodCallback;
 /**
- * @method \LSYS\Database database_config_db() 
- * @method string database_config_table() 
+ * @method \LSYS\Database databaseConfigDb() 
+ * @method string databaseConfigTable() 
  */
 class DatabaseDepend extends DI{
     public static function get(){
         if(!self::has())self::set(function(){
             return (new self)
-            ->database_config_db(new MethodCallback(function(){
+            ->databaseConfigDb(new MethodCallback(function(){
                 return \LSYS\Database\DI::get()->db();
             }))
-            ->database_config_table(new MethodCallback(function(){
+            ->databaseConfigTable(new MethodCallback(function(){
                 return 'config';
             }));
         });

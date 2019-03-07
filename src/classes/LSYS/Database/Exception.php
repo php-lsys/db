@@ -21,14 +21,14 @@ class Exception extends \LSYS\Exception{
 	 */
 	public function __construct($message = "", $code = 0, \Exception $previous = NULL)
 	{
-	    if (DIRECTORY_SEPARATOR === '\\'&&$this->_is_gb2312($message)){
+	    if (DIRECTORY_SEPARATOR === '\\'&&$this->_isGb2312($message)){
 	        if(PHP_SAPI!=='cli'||PHP_SAPI==='cli'&&version_compare(PHP_VERSION,'7.0.0',">=")){
 				$message=iconv("gb2312", "utf-8",$message);//windows in china : cover string
 			}
 		}
 		parent::__construct($message,$code,$previous);
 	}
-	private function _is_gb2312($str)
+	private function _isGb2312($str)
 	{
 		for($i=0; $i<strlen($str); $i++) {
 			$v = ord( $str[$i] );
@@ -56,7 +56,7 @@ class Exception extends \LSYS\Exception{
 	 * @param string $sql
 	 * @return \LSYS\Database\Exception
 	 */
-	public function set_error_sql($sql){
+	public function setErrorSql($sql){
 		if (Core::$environment!==Core::PRODUCT){
 			$this->message.=" [{$sql}]";
 		}
@@ -67,7 +67,7 @@ class Exception extends \LSYS\Exception{
 	 * get error sql
 	 * @return string
 	 */
-	public function get_error_sql(){
+	public function getErrorSql(){
 		return $this->_error_sql;
 	}
 }

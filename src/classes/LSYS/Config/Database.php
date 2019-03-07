@@ -22,8 +22,8 @@ class Database implements Config,\Serializable{
 	 */
 	public function __construct ($name,DatabaseDepend $depend=null){
 	    $depend=$depend?$depend:DatabaseDepend::get();
-	    $db=$depend->database_config_db();
-	    $table=$depend->database_config_table();
+	    $db=$depend->databaseConfigDb();
+	    $table=$depend->databaseConfigTable();
 		$name=trim($name);
 		$this->_name=$name;
 		$this->_db=$db;
@@ -31,7 +31,7 @@ class Database implements Config,\Serializable{
 		// id name value
 		$len=strlen($name);
 		$name=$this->_db->quote($name.'%');
-		$table=$this->_db->quote_table($table);
+		$table=$this->_db->quoteTable($table);
 		$sql="select name,value from {$table} where name like {$name}";
 		$row=$this->_db->query(\LSYS\Database::DQL,$sql);
 		$this->_load=count($row)>0;
@@ -92,9 +92,9 @@ class Database implements Config,\Serializable{
 	}
 	/**
 	 * {@inheritDoc}
-	 * @see \LSYS\Config::as_array()
+	 * @see \LSYS\Config::asArray()
 	 */
-	public function as_array (){
+	public function asArray(){
 		return $this->_node;
 	}
 	/**
@@ -116,7 +116,7 @@ class Database implements Config,\Serializable{
 		return true;
 	}
 	protected function _save($key,$value){
-		$table=$this->_db->quote_table($this->_table);
+		$table=$this->_db->quoteTable($this->_table);
 		if ($value===null){
 			$_key=$this->_db->quote($this->_name.".".$key.'%');
 			$sql="DELETE FROM {$table} WHERE name like {$_key}";
