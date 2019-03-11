@@ -405,7 +405,7 @@ abstract class Database implements \Serializable{
 	 * @param string $type        	
 	 * @return array
 	 */
-	public function datatype($type) {
+	protected function datatype($type) {
 		$types = array (
 				'blob' => array (
 					'type' => 'string',
@@ -743,7 +743,7 @@ abstract class Database implements \Serializable{
 	 *        	column more data
 	 * @return array
 	 */
-	abstract public function listColumns($table, $like = NULL, $column_info = TRUE);
+	abstract public function listColumns($table, $like = NULL);
 	/**
 	 * Perform an SQL query of the given type.
 	 *
