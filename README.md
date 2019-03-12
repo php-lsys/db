@@ -10,17 +10,17 @@
 
 > 本库未实现任何可用的数据库适配,请根据实际需求引入以下包:
 
-	"lsys/db-mysqli":"~1.0.0", [支持读写分离,异步查询`lsys/dbasync-mysqli`]
-	"lsys/db-pdo-mysql":"~1.0.0", [支持读写分离]
-	"lsys/db-pdo-postgresql":"~1.0.0", [支持读写分离]
-	"lsys/db-pdo-sqlite":"~1.0.0",
-	"lsys/db-postgresql":"~1.0.0",
+	"lsys/db-mysqli":"~2.0.0", [支持读写分离,异步查询`lsys/dbasync-mysqli`]
+	"lsys/db-pdo-mysql":"~2.0.0", [支持读写分离]
+	"lsys/db-pdo-postgresql":"~2.0.0", [支持读写分离]
+	"lsys/db-pdo-sqlite":"~2.0.0",
+	"lsys/db-postgresql":"~2.0.0",
 
 > 使用读写分离时,有更改延时对从库进行查询操作数据存放使用依赖包:
 	
-	"lsys/db-rwcache-memcache":"~1.0.0",
-	"lsys/db-rwcache-memcached":"~1.0.0",
-	"lsys/db-rwcache-redis":"~1.0.0"
+	"lsys/db-rwcache-memcache":"~2.0.0",
+	"lsys/db-rwcache-memcached":"~2.0.0",
+	"lsys/db-rwcache-redis":"~2.0.0"
 
 
 1. 执行SQL时需指定SQL的类型 [DBMS] ,除 Database::DQL 返回 Result 对象外,其他返回处理状态:
