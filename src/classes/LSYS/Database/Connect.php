@@ -60,7 +60,6 @@ abstract class Connect {
 		}
 		if($weight===0)return NULL;
 		$_k=0;
-		$_w=0;
 		$_c=0;
 		$r=rand(1,$weight);
 		foreach ($wa as $k=>$v){
