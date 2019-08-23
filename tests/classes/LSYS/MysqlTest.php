@@ -39,7 +39,7 @@ final class MysqlPTest extends TestCase
         $table_name=$this->_db->quoteTable("order");
         $value=$this->_db->quote("SN001");
         $sql="select * from {$table_name} where sn={$value}";
-        $result= $this->_db->query(Database::DQL, $sql);//DQL返回结果对象,其他返回布尔
+        $result= $this->_db->query( $sql);//DQL返回结果对象,其他返回布尔
         $this->assertInstanceOf(Result::class, $result);
     }
     public function testdel()

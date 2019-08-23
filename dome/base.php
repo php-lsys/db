@@ -21,7 +21,7 @@ $value=$db->quote("SN001");
 // $column=$db->quoteColumn("sn");
 //------------------------------------查询---------------------------------------
 $sql="select * from {$table_name} where sn={$value}";
-$result= $db->query(Database::DQL, $sql);//DQL返回结果对象,其他返回布尔
+$result= $db->query( $sql);//DQL返回结果对象,其他返回布尔
 
 //直接拿结果
 $record=$result->current();//第一个结果

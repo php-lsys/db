@@ -23,17 +23,10 @@
 	"lsys/db-rwcache-redis":"~2.0.0"
 
 
-1. 执行SQL时需指定SQL的类型 [DBMS] ,除 Database::DQL 返回 Result 对象外,其他返回处理状态:
-	*. Database::DQL 表示此SQL为数据库查询语句 如 select show desc　语句
-	*. Database::DML 表示此SQL为数据库操纵语句 如 insert update delete 语句
-	*. Database::DDL 表示此SQL为数据库定义语句 如 create 语句
-	*. Database::DCL 表示此SQL为数据库控制语句 如 grant revoke commit 语句
-
-
-2. 数据库配置使用 [https://github.com/lsys/config] 请参考 lconfig 文档
+1. 数据库配置使用 [https://github.com/lsys/config] 请参考 lconfig 文档
 > 通过修改 \LSYS\Database\DI::$config="database.mysqli"; 默认使用那个配置
 
-3. 可自行实现具体的数据库操作接口,示例可参考以上已实现包或邮件我
+2. 可自行实现具体的数据库操作接口,示例可参考以上已实现包或邮件我
 
 以MYSQL为例使用示例
 ---
@@ -60,7 +53,7 @@ $table_name=$db->quote_table("order");
 
 ```
 //------------------------------------查询---------------------------------------
-$prepare=$db->prepare(Database::DQL, "select * from {$table_name} where sn=:sn");
+$prepare=$db->prepare("select * from {$table_name} where sn=:sn");
 $prepare->bindValue("sn",'SN001');
 //OR 多个绑定
 //$prepare->bindValue(array("sn"=>"SN001"));
@@ -75,7 +68,7 @@ foreach ($result as $v){
 //------------------------------------插入-------------------------------------------
 $sql="insert into {$table_name} (`sn`, `title`, `add_time`) values (:sn, :title, :add_time)";
 //发送SQL 请求
-$prepare=$db->prepare(Database::DML, $sql);
+$prepare=$db->prepare($sql);
 $prepare->bindValue(array(
 	'sn'=>'SN001',
 	'title'=>'title'.uniqid(),
@@ -92,7 +85,7 @@ if ($prepare->execute()){
 ```
 //------------------------------------更新-------------------------------------------
 $sql="update {$table_name} set title=:title where id=:id";
-$prepare=$db->prepare(Database::DML, $sql);
+$prepare=$db->prepare($sql);
 $prepare->bindValue(array(
 	'id'=>1,
 	'title'=>'title'.uniqid(),
@@ -106,7 +99,7 @@ if ($prepare->execute()){
 ```
 //------------------------------------删除-------------------------------------------
 $sql="delete from {$table_name} where id=:id";
-$prepare=$db->prepare(Database::DML, $sql);
+$prepare=$db->prepare($sql);
 $prepare->bindValue(array(
 	'id'=>3,
 ));

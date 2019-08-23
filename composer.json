@@ -2,7 +2,7 @@
 	"name": "lsys/db",
 	"type" : "library",
 	"license": "Apache-2.0",
-	"version" : "2.0.0",
+
 	"description" : "lsys module db",
 	"autoload":{
 		"psr-4": {
@@ -12,28 +12,28 @@
     },
     "require": {
      	"php": ">=5.4",
-     	"lsys/i18n":"~2.0.0",
-     	"lsys/config":"~2.0.0"
+     	"lsys/i18n":"~2.1.0",
+     	"lsys/config":"~2.1.0"
 	},
 	"require-dev": {
-     	"lsys/profiler":"~2.0.0",
-     	"lsys/event":"~2.0.0",
-     	"lsys/db-mysqli":"~2.0.0",
-     	"lsys/db-rwcache-redis":"~2.0.0",
+     	"lsys/profiler":"~2.1.0",
+     	"lsys/event":"~2.1.0",
+     	"lsys/db-mysqli":"~2.1.0",
+     	"lsys/db-rwcache-redis":"~2.1.0",
      	"phpunit/phpunit" : "~7.1.5",
      	"php-coveralls/php-coveralls":"~v2.0.0"
 	},
 	"suggest": {
-		"lsys/profiler":"~2.0.0",
-     	"lsys/event":"~2.0.0",
-		"lsys/db-pdo":"~2.0.0",
-		"lsys/db-mysqli":"~2.0.0",
-		"lsys/db-pdo-mysql":"~2.0.0",
-		"lsys/db-pdo-postgresql":"~2.0.0",
-		"lsys/db-pdo-sqlite":"~2.0.0",
-		"lsys/db-postgresql":"~2.0.0",
-		"lsys/db-rwcache-memcache":"~2.0.0",
-     	"lsys/db-rwcache-memcached":"~2.0.0",
-     	"lsys/db-rwcache-redis":"~2.0.0"
+		"lsys/profiler":"~2.1.0",
+     	"lsys/event":"~2.1.0",
+		"lsys/db-pdo":"~2.1.0",
+		"lsys/db-mysqli":"~2.1.0",
+		"lsys/db-pdo-mysql":"~2.1.0",
+		"lsys/db-pdo-postgresql":"~2.1.0",
+		"lsys/db-pdo-sqlite":"~2.1.0",
+		"lsys/db-postgresql":"~2.1.0",
+		"lsys/db-rwcache-memcache":"~2.1.0",
+     	"lsys/db-rwcache-memcached":"~2.1.0",
+     	"lsys/db-rwcache-redis":"~2.1.0"
     }
 }

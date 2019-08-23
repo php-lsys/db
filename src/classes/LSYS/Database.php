@@ -21,28 +21,6 @@ use LSYS\Database\ConnectParam;
  *        
  */
 abstract class Database implements \Serializable{
-	//query type
-	/**
-	 * 数据查询语言
-	 * @var integer
-	 */
-	const DQL=1;
-	/**
-	 * 数据操纵语言
-	 * @var integer
-	 */
-	const DML=2;
-	/**
-	 * 数据定义语言
-	 * @var integer
-	 */
-	const DDL=3;
-	/**
-	 * 数据控制语言
-	 * @var integer
-	 */
-	const DCL=4;
-	
 	/**
 	 * @var integer
 	 */
@@ -88,7 +66,7 @@ abstract class Database implements \Serializable{
 	    $name=$config->name();
 	    $driver=$config->get("type",NULL);
 	    if (!$driver||!class_exists($driver,true)||!in_array(Database::class,class_parents($driver))){
-	        throw new \LSYS\Database\Exception( __('Database type not defined in [:name on :driver] configuration',array("name"=>$name,"driver"=>$driver)));
+	        throw new \LSYS\Database\Exception( __('Database type not defined in [:name on :driver] configuration',array(":name"=>$name,":driver"=>$driver)));
 	    }
 	    return new $driver ( $config ,$cache);
 	}
@@ -289,7 +267,7 @@ abstract class Database implements \Serializable{
 	 * Disconnect from the database.
 	 * @return boolean
 	 */
-	public function disconnect() {
+	public function disConnect() {
 		$this->_connection&&$this->_connection->disconnect();
 		$this->_connection=null;
 		return TRUE;
@@ -299,8 +277,6 @@ abstract class Database implements \Serializable{
 	 */
 	public function __destruct(){
 		$this->disconnect();
-		//$name=$this->_config->name();
-		//clear instance cache
 	}
 	/**
 	 * Returns the database instance name.
@@ -369,354 +345,6 @@ abstract class Database implements \Serializable{
 		return $table;
 	}
 	/**
-	 * Extracts the text between parentheses, if any.
-	 *
-	 * // Returns: array('CHAR', '6')
-	 * list($type, $length) = $db->_parseType('CHAR(6)');
-	 *
-	 * @param string $type        	
-	 * @return array list containing the type and length, if any
-	 */
-	protected function _parseType($type) {
-		if (($open = strpos ( $type, '(' )) === FALSE) {
-			// No length specified
-			return array (
-					$type,
-					NULL 
-			);
-		}
-		// Closing parenthesis
-		$close = strrpos ( $type, ')', $open );
-		
-		// Length without parentheses
-		$length = substr ( $type, $open + 1, $close - 1 - $open );
-		
-		// Type without the length
-		$type = substr ( $type, 0, $open ) . substr ( $type, $close + 1 );
-		
-		return array (
-				$type,
-				$length 
-		);
-	}
-	/**
-	 * 类型映射
-	 * 
-	 * @param string $type        	
-	 * @return array
-	 */
-	protected function datatype($type) {
-		$types = array (
-				'blob' => array (
-					'type' => 'string',
-					'binary' => TRUE,
-					'character_maximum_length' => '65535' 
-				),
-				'bool' => array (
-						'type' => 'bool' 
-				),
-				'bigint unsigned' => array (
-						'type' => 'int',
-						'min' => '0',
-						'max' => '18446744073709551615' 
-				),
-				'datetime' => array (
-						'type' => 'string' 
-				),
-				'decimal unsigned' => array (
-						'type' => 'float',
-						'exact' => TRUE,
-						'min' => '0' 
-				),
-				'double' => array (
-						'type' => 'float' 
-				),
-				'double precision unsigned' => array (
-						'type' => 'float',
-						'min' => '0' 
-				),
-				'double unsigned' => array (
-						'type' => 'float',
-						'min' => '0' 
-				),
-				'enum' => array (
-						'type' => 'string' 
-				),
-				'fixed' => array (
-						'type' => 'float',
-						'exact' => TRUE 
-				),
-				'fixed unsigned' => array (
-						'type' => 'float',
-						'exact' => TRUE,
-						'min' => '0' 
-				),
-				'float unsigned' => array (
-						'type' => 'float',
-						'min' => '0' 
-				),
-				'int unsigned' => array (
-						'type' => 'int',
-						'min' => '0',
-						'max' => '4294967295' 
-				),
-				'integer unsigned' => array (
-						'type' => 'int',
-						'min' => '0',
-						'max' => '4294967295' 
-				),
-				'longblob' => array (
-						'type' => 'string',
-						'binary' => TRUE,
-						'character_maximum_length' => '4294967295' 
-				),
-				'longtext' => array (
-						'type' => 'string',
-						'character_maximum_length' => '4294967295' 
-				),
-				'mediumblob' => array (
-						'type' => 'string',
-						'binary' => TRUE,
-						'character_maximum_length' => '16777215' 
-				),
-				'mediumint' => array (
-						'type' => 'int',
-						'min' => '-8388608',
-						'max' => '8388607' 
-				),
-				'mediumint unsigned' => array (
-						'type' => 'int',
-						'min' => '0',
-						'max' => '16777215' 
-				),
-				'mediumtext' => array (
-						'type' => 'string',
-						'character_maximum_length' => '16777215' 
-				),
-				'national varchar' => array (
-						'type' => 'string' 
-				),
-				'numeric unsigned' => array (
-						'type' => 'float',
-						'exact' => TRUE,
-						'min' => '0' 
-				),
-				'nvarchar' => array (
-						'type' => 'string' 
-				),
-				'point' => array (
-						'type' => 'string',
-						'binary' => TRUE 
-				),
-				'real unsigned' => array (
-						'type' => 'float',
-						'min' => '0' 
-				),
-				'set' => array (
-						'type' => 'string' 
-				),
-				'smallint unsigned' => array (
-						'type' => 'int',
-						'min' => '0',
-						'max' => '65535' 
-				),
-				'text' => array (
-						'type' => 'string',
-						'character_maximum_length' => '65535' 
-				),
-				'tinyblob' => array (
-						'type' => 'string',
-						'binary' => TRUE,
-						'character_maximum_length' => '255' 
-				),
-				'tinyint' => array (
-						'type' => 'int',
-						'min' => '-128',
-						'max' => '127' 
-				),
-				'tinyint unsigned' => array (
-						'type' => 'int',
-						'min' => '0',
-						'max' => '255' 
-				),
-				'tinytext' => array (
-						'type' => 'string',
-						'character_maximum_length' => '255' 
-				),
-				'year' => array (
-						'type' => 'string' 
-				) 
-		);
-		
-		$type = str_replace ( ' zerofill', '', $type );
-		if (isset ( $types [$type] ))
-			return $types [$type];
-		$types = array (
-				// SQL-92
-				'bit' => array (
-						'type' => 'string',
-						'exact' => TRUE 
-				),
-				'bit varying' => array (
-						'type' => 'string' 
-				),
-				'char' => array (
-						'type' => 'string',
-						'exact' => TRUE 
-				),
-				'char varying' => array (
-						'type' => 'string' 
-				),
-				'character' => array (
-						'type' => 'string',
-						'exact' => TRUE 
-				),
-				'character varying' => array (
-						'type' => 'string' 
-				),
-				'date' => array (
-						'type' => 'string' 
-				),
-				'dec' => array (
-						'type' => 'float',
-						'exact' => TRUE 
-				),
-				'decimal' => array (
-						'type' => 'float',
-						'exact' => TRUE 
-				),
-				'double precision' => array (
-						'type' => 'float' 
-				),
-				'float' => array (
-						'type' => 'float' 
-				),
-				'int' => array (
-						'type' => 'int',
-						'min' => '-2147483648',
-						'max' => '2147483647' 
-				),
-				'integer' => array (
-						'type' => 'int',
-						'min' => '-2147483648',
-						'max' => '2147483647' 
-				),
-				'interval' => array (
-						'type' => 'string' 
-				),
-				'national char' => array (
-						'type' => 'string',
-						'exact' => TRUE 
-				),
-				'national char varying' => array (
-						'type' => 'string' 
-				),
-				'national character' => array (
-						'type' => 'string',
-						'exact' => TRUE 
-				),
-				'national character varying' => array (
-						'type' => 'string' 
-				),
-				'nchar' => array (
-						'type' => 'string',
-						'exact' => TRUE 
-				),
-				'nchar varying' => array (
-						'type' => 'string' 
-				),
-				'numeric' => array (
-						'type' => 'float',
-						'exact' => TRUE 
-				),
-				'real' => array (
-						'type' => 'float' 
-				),
-				'smallint' => array (
-						'type' => 'int',
-						'min' => '-32768',
-						'max' => '32767' 
-				),
-				'time' => array (
-						'type' => 'string' 
-				),
-				'time with time zone' => array (
-						'type' => 'string' 
-				),
-				'timestamp' => array (
-						'type' => 'string' 
-				),
-				'timestamp with time zone' => array (
-						'type' => 'string' 
-				),
-				'varchar' => array (
-						'type' => 'string' 
-				),
-				
-				// SQL:1999
-				'binary large object' => array (
-						'type' => 'string',
-						'binary' => TRUE 
-				),
-				'blob' => array (
-						'type' => 'string',
-						'binary' => TRUE 
-				),
-				'boolean' => array (
-						'type' => 'bool' 
-				),
-				'char large object' => array (
-						'type' => 'string' 
-				),
-				'character large object' => array (
-						'type' => 'string' 
-				),
-				'clob' => array (
-						'type' => 'string' 
-				),
-				'national character large object' => array (
-						'type' => 'string' 
-				),
-				'nchar large object' => array (
-						'type' => 'string' 
-				),
-				'nclob' => array (
-						'type' => 'string' 
-				),
-				'time without time zone' => array (
-						'type' => 'string' 
-				),
-				'timestamp without time zone' => array (
-						'type' => 'string' 
-				),
-				
-				// SQL:2003
-				'bigint' => array (
-						'type' => 'int',
-						'min' => '-9223372036854775808',
-						'max' => '9223372036854775807' 
-				),
-				
-				// SQL:2008
-				'binary' => array (
-						'type' => 'string',
-						'binary' => TRUE,
-						'exact' => TRUE 
-				),
-				'binary varying' => array (
-						'type' => 'string',
-						'binary' => TRUE 
-				),
-				'varbinary' => array (
-						'type' => 'string',
-						'binary' => TRUE 
-				) 
-		);
-		if (isset ( $types [$type] ))
-			return $types [$type];
-		return array ();
-	}
-	/**
 	 * escape value
 	 * @param string $value        	
 	 * @throws \LSYS\Database\Exception
@@ -733,32 +361,21 @@ abstract class Database implements \Serializable{
 	 */
 	abstract public function setCharset($charset);
 	/**
-	 * Lists all of the columns in a table.
-	 *
-	 * @param string $table
-	 *        	table to get columns from
-	 * @param string $like
-	 *        	column to search for
-	 * @param boolean $column_info
-	 *        	column more data
-	 * @return array
-	 */
-	abstract public function listColumns($table, $like = NULL);
-	/**
 	 * Perform an SQL query of the given type.
 	 *
 	 * @param   integer  $type     
 	 * @param   string   $sql        SQL query
 	 * @return  Result|bool Database::DQL|Database::**L
 	 */
-	abstract public function query($type, $sql);
+	abstract public function query($sql,array $data=[]);
 	/**
-	 * return reepare obj
-	 * @param int $type
-	 * @param string $sql
-	 * @return Prepare
+	 * Perform an SQL query of the given type.
+	 *
+	 * @param   integer  $type
+	 * @param   string   $sql        SQL query
+	 * @return  Result|bool Database::DQL|Database::**L
 	 */
-	abstract public function prepare($type,$sql);
+	abstract public function exec($sql,array $data=[]);
 	/**
 	 * return last query affected rows
 	 * @return int
@@ -800,18 +417,17 @@ abstract class Database implements \Serializable{
 	 */
 	abstract public function listTables($like = NULL);
 	/**
-	 * set attribute
-	 * @param string $attr
-	 * @param mixed $value
-	 * @return bool
+	 * Lists all of the columns in a table.
+	 *
+	 * @param string $table
+	 *        	table to get columns from
+	 * @param string $like
+	 *        	column to search for
+	 * @param boolean $column_info
+	 *        	column more data
+	 * @return array
 	 */
-	abstract public function setAttr($attr, $value);
-	/**
-	 * get attribute
-	 * @param string $attr
-	 * @return null
-	 */
-	abstract public function getAttr($attr);
+	abstract public function listColumns($table, $like = NULL);
 	/**
 	 * dump object
 	 */
