@@ -19,7 +19,6 @@
 		"files": ["src/common/Bootstarp.php"]
     },
     "require": {
-     	"php": ">=5.4",
      	"lsys/i18n":"~2.1.0",
      	"lsys/config":"~2.1.0"
 	},
