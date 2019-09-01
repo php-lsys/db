@@ -2,11 +2,19 @@
 	"name": "lsys/db",
 	"type" : "library",
 	"license": "Apache-2.0",
-
 	"description" : "lsys module db",
 	"autoload":{
 		"psr-4": {
-        	"LSYS\\" : "src/classes/LSYS/"
+        	"LSYS\\" : [
+        		"src/common/classes/LSYS/",
+        		"src/driver-pdo/classes/LSYS/",
+        		"src/driver-pdo-mysql/classes/LSYS/",
+        		"src/driver-pdo-postgresql/classes/LSYS/",
+        		"src/driver-pdo-sqlite/classes/LSYS/",
+        		"src/slave-query-check-cache-memcache/classes/LSYS/",
+        		"src/slave-query-check-cache-memcached/classes/LSYS/",
+        		"src/slave-query-check-cache-redis/classes/LSYS/"
+        	]
 		},
 		"files": ["src/Bootstarp.php"]
     },
@@ -18,22 +26,21 @@
 	"require-dev": {
      	"lsys/profiler":"~2.1.0",
      	"lsys/event":"~2.1.0",
-     	"lsys/db-mysqli":"~2.1.0",
-     	"lsys/db-rwcache-redis":"~2.1.0",
+     	"ext-mysqli":"*",
+     	"ext-pdo":"*",
      	"phpunit/phpunit" : "~7.1.5",
      	"php-coveralls/php-coveralls":"~v2.0.0"
 	},
 	"suggest": {
 		"lsys/profiler":"~2.1.0",
      	"lsys/event":"~2.1.0",
-		"lsys/db-pdo":"~2.1.0",
-		"lsys/db-mysqli":"~2.1.0",
-		"lsys/db-pdo-mysql":"~2.1.0",
-		"lsys/db-pdo-postgresql":"~2.1.0",
-		"lsys/db-pdo-sqlite":"~2.1.0",
-		"lsys/db-postgresql":"~2.1.0",
-		"lsys/db-rwcache-memcache":"~2.1.0",
-     	"lsys/db-rwcache-memcached":"~2.1.0",
-     	"lsys/db-rwcache-redis":"~2.1.0"
+     	"ext-mysqli":"*",
+     	"lsys/memcache":"~2.1.0",
+     	"lsys/memcached":"~2.1.0",
+     	"lsys/redis":"~2.1.0",
+     	"ext-pdo":"*",
+     	"ext-pdo_sqlite":"*",
+     	"ext-pdo_mysql":"*",
+     	"ext-pdo_postgresql":"*"
     }
 }

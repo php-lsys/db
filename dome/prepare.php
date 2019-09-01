@@ -1,6 +1,7 @@
 <?php
 use LSYS\Database\DI;
 use LSYS\Database;
+use LSYS\Database\Result;
 include __DIR__."/Bootstarp.php";
 $db =DI::get()->db("database.mysqli");
 //$db = Database::factory(LSYS\Config\DI::get()->config("database.mysqli"));
@@ -13,13 +14,10 @@ $table_name=$db->quoteTable("order");
 //================================预编译SQL使用示例========================================
 
 //------------------------------------查询---------------------------------------
-$prepare=$db->prepare(Database::DQL, "select * from {$table_name} where sn=:sn");
-$prepare->bindValue("sn",'SN001');
-//OR 多个绑定
-//$prepare->bindValue(array("sn"=>"SN001"));
-$result=$prepare->execute();
+$prepare=$db->prepare("select * from {$table_name} where sn=:sn");
+$result=$prepare->query(array(":sn"=>"SN001"));
 //$result 和 db->query 返回保持一致
-//$result->setFetchMode(Database::FETCH_OBJ);
+$result->setFetchMode(Result::FETCH_OBJ);
 //直接拿结果
 $record=$result->current();//第一个结果
 if ($record===null){
@@ -33,13 +31,12 @@ foreach ($result as $v){
 //------------------------------------插入-------------------------------------------
 $sql="insert into {$table_name} (`sn`, `title`, `add_time`) values (:sn, :title, :add_time)";
 //发送SQL 请求
-$prepare=$db->prepare(Database::DML, $sql);
-$prepare->bindValue(array(
-	'sn'=>'SN001',
-	'title'=>'title'.uniqid(),
-	'add_time'=>time(),
-));
-if ($prepare->execute()){
+$prepare=$db->prepare( $sql);
+if ($prepare->exec(array(
+    'sn'=>'SN001',
+    'title'=>'title'.uniqid(),
+    'add_time'=>time(),
+))){
 	//成功
 	echo $prepare->insertId();//最后插入ID
 	echo "\n";
@@ -49,12 +46,11 @@ if ($prepare->execute()){
 
 //------------------------------------更新-------------------------------------------
 $sql="update {$table_name} set title=:title where id=:id";
-$prepare=$db->prepare(Database::DML, $sql);
-$prepare->bindValue(array(
-	'id'=>1,
-	'title'=>'title'.uniqid(),
-));
-if ($prepare->execute()){
+$prepare=$db->prepare($sql);
+if ($prepare->exec(array(
+    'id'=>1,
+    'title'=>'title'.uniqid(),
+))){
 	//成功
 	echo $prepare->affectedRows();//影响行数
 	echo "\n";
@@ -62,11 +58,10 @@ if ($prepare->execute()){
 
 //------------------------------------删除-------------------------------------------
 $sql="delete from {$table_name} where id=:id";
-$prepare=$db->prepare(Database::DML, $sql);
-$prepare->bindValue(array(
-	'id'=>3,
-));
-if ($prepare->execute()){
+$prepare=$db->prepare($sql);
+if ($prepare->exec(array(
+    'id'=>3,
+))){
 	//成功
 	echo $prepare->affectedRows();//影响行数
 	echo "\n";

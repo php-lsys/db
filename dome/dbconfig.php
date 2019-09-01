@@ -9,10 +9,7 @@ include __DIR__."/Bootstarp.php";
 // });
 //-------------------------------------------------------
 
-$config = new LSYS\Config\Database("aaa");
-var_dump(serialize($config));
-var_dump($config->get("bbb"));
-var_dump(unserialize(serialize($config))->asArray());
+
 
 
 
