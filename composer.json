@@ -16,7 +16,7 @@
         		"src/slave-query-check-cache-redis/classes/LSYS/"
         	]
 		},
-		"files": ["src/Bootstarp.php"]
+		"files": ["src/common/Bootstarp.php"]
     },
     "require": {
      	"php": ">=5.4",
