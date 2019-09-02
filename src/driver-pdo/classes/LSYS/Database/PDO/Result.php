@@ -26,6 +26,7 @@ class Result extends \LSYS\Database\Result{
 	{
 	    $this->result=$result;
 	    $this->total_rows = $this->result->rowCount();
+	    if($this->total_rows==0)$this->init();
 	}
 	public function setFetchMode($mode,$classname=NULL, array $ctorargs=NULL){
 	    parent::setFetchMode($mode,$classname,$ctorargs);
