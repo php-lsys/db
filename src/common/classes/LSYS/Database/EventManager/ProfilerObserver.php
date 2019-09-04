@@ -5,32 +5,44 @@
  * @license    http://www.apache.org/licenses/LICENSE-2.0
  */
 namespace LSYS\Database\EventManager;
-class ProfilerObserver implements \SplObserver
+use LSYS\EventManager\Event;
+use LSYS\EventManager\EventObserver;
+class ProfilerObserver implements EventObserver
 {
     protected $profiler;
     protected $token;
     public function __construct(\LSYS\Profiler $profiler){
         $this->profiler=$profiler;
     }
-    public function update(\SplSubject $subject)
+    public function eventNotify(Event $event)
     {
-        $event=$subject->event();
         switch ($event->name()) {
             case DBEvent::QUERY_START:
             case DBEvent::EXEC_START:
                 $this->token = $this->profiler->start("Database",$event->eventargs()[0]);
-            break;
+                break;
             case DBEvent::QUERY_OK:
             case DBEvent::EXEC_OK:
                 if($this->token){
                     $this->profiler->stop($this->token);
                     $this->token=null;
                 }
-            break;
+                break;
             case DBEvent::QUERY_ERROR:
             case DBEvent::EXEC_ERROR:
                 $this->token=null;
-            break;
+                break;
         }
+    }
+    public function eventName()
+    {
+        return [
+            DBEvent::QUERY_START,
+            DBEvent::QUERY_OK,
+            DBEvent::QUERY_ERROR,
+            DBEvent::EXEC_START,
+            DBEvent::EXEC_OK,
+            DBEvent::EXEC_ERROR,
+        ];
     }
 }

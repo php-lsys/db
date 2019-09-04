@@ -3,7 +3,10 @@ use LSYS\Database;
 use LSYS\Database\DI;
 include __DIR__."/Bootstarp.php";
 $db =DI::get()->db("database.mysqli");
-$db = Database::factory(LSYS\Config\DI::get()->config("database.mysqli"));
+$db = Database::factory(LSYS\Config\DI::get()->config("database.mysqli"))
+//    ->setEventManager(\LSYS\EventManager\DI::get()->eventManager())
+//    ->setSlaveQueryCheck(new LSYS\Database\SlaveQueryCheck(new LSYS\Database\SlaveQueryCheck\Cache\Memcached()))
+;
 
 
 //得到完整表名

@@ -8,12 +8,13 @@
 namespace LSYS\Database;
 use LSYS\Database\SlaveQueryCheck\Parse;
 use LSYS\Database\SlaveQueryCheck\Cache;
+use LSYS\Database\SlaveQueryCheck\Parse\Simple;
 class SlaveQueryCheck{
     protected $cache;
     protected $parse;
-    public function __construct(Cache $cache,Parse $parse){
+    public function __construct(Cache $cache,Parse $parse=null){
         $this->cache=$cache;
-        $this->parse=$parse;
+        $this->parse=$parse?$parse:new Simple();
     }
     /**
      * 检测当前SQL是否可以通过从库查询

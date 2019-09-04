@@ -5,8 +5,8 @@
  * @copyright  (c) 2017 Lonely <shan.liu@msn.com>
  * @license    http://www.apache.org/licenses/LICENSE-2.0
  */
-namespace LSYS\Database\RWCache\Cache;
-use LSYS\Database\RWCache\Cache;
+namespace LSYS\Database\SlaveQueryCheck\Cache;
+use LSYS\Database\SlaveQueryCheck\Cache;
 class Memcache implements Cache{
     protected $memcache;
     protected $prefix;
