@@ -8,15 +8,18 @@ namespace LSYS\Database\EventManager;
 use LSYS\EventManager\Event;
 class DBEvent extends Event
 {
-    const QUERY_START=1;
-    const QUERY_OK=2;
-    const QUERY_ERROR=3;
-    const QUERY_END=4;
-    const EXEC_START=5;
-    const EXEC_OK=6;
-    const EXEC_ERROR=7;
-    const EXEC_END=8;
-    const TRANSACTION_BEGIN=9;
-    const TRANSACTION_COMMIT=10;
-    const TRANSACTION_ROLLBACK=11;
+    const QUERY_START="db.query.start";
+    const QUERY_OK="db.query.ok";
+    const QUERY_ERROR="db.query.error";
+    const QUERY_END="db.query.end";
+    const EXEC_START="db.exec.start";
+    const EXEC_OK="db.exec.ok";
+    const EXEC_ERROR="db.exec.error";
+    const EXEC_END="db.exec.end";
+    const TRANSACTION_BEGIN="db.transaction.begin";
+    const TRANSACTION_COMMIT="db.transaction.commit";
+    const TRANSACTION_ROLLBACK="db.transaction.rollback";
+    public static function queryStart($sql) {
+        return new self(self::QUERY_START,['sql'=>$sql]);
+    }
 }
