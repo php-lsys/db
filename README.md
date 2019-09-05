@@ -5,7 +5,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/php-lsys/db/badge.svg?branch=master)](https://coveralls.io/github/php-lsys/db?branch=master)
 
 > 目的:使数据库层有统一封装,从而使数据库的调用保持一致的接口,如果需要更加自动化的数据库层的操作,
-	请使用 [ https://github.com/lsys/model ] 或　[ https://github.com/lsys/orm ]
+	请使用 [ https://github.com/lsys/model ]
 
 
 1. 数据库配置使用 [https://github.com/lsys/config] 请参考 lconfig 文档
