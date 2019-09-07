@@ -7,10 +7,11 @@
 		"psr-4": {
         	"LSYS\\" : [
         		"src/common/classes/LSYS/",
+        		"src/config-db/classes/LSYS/",
+        		"src/driver-mysqli/classes/LSYS/",
         		"src/driver-pdo/classes/LSYS/",
         		"src/driver-pdo-mysql/classes/LSYS/",
         		"src/driver-pdo-postgresql/classes/LSYS/",
-        		"src/driver-pdo-sqlite/classes/LSYS/",
         		"src/slave-query-check-cache-memcache/classes/LSYS/",
         		"src/slave-query-check-cache-memcached/classes/LSYS/",
         		"src/slave-query-check-cache-redis/classes/LSYS/"
