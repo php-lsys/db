@@ -138,9 +138,9 @@ class Prepare extends \LSYS\Database\Prepare{
             }
             break;
         }
-        return new Result($this->prepare->getresult(),function(){
-            $this->prepare->nextresult();
-            return $this->prepare->getresult();
+        return new Result($this->prepare->get_result(),function(){
+            $this->prepare->next_result();
+            return $this->prepare->get_result();
         });
     }
 	/**
@@ -166,7 +166,7 @@ class Prepare extends \LSYS\Database\Prepare{
 	        }
 	        break;
 	    }
-	    $this->slave_check->execNotify($connect_mgr->schema($this->connect),$this->sql);
+	    $this->slave_check&&$this->slave_check->execNotify($connect_mgr->schema($this->connect),$this->sql);
 	    $this->affected_rows=$this->connect->affected_rows;
 	    $this->insert_id=$this->connect->insert_id;
 	    return true;

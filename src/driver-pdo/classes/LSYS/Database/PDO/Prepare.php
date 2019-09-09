@@ -156,6 +156,7 @@ class Prepare extends \LSYS\Database\Prepare{
             }
             break;
         }
+        $this->slave_check&&$this->slave_check->execNotify($this->db->getConnectManager()->schema($this->connect),$this->query_sql);
         $this->insert_id=$this->connect->lastInsertId();
         return true;
     }

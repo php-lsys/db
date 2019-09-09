@@ -8,11 +8,15 @@
 namespace LSYS\Database\MYSQLi;
 class Result extends \LSYS\Database\Result{
 	protected $next_result;
+	/**
+	 * @var \mysqli_result
+	 */
 	protected $result;
+	protected $index=0;
 	public function __construct($result,$next_result=null)
 	{
-	    $this->next_result=$next_result;
 	    $this->result=$result;
+	    $this->next_result=$next_result;
 	}
 	public function current()
 	{
@@ -41,11 +45,12 @@ class Result extends \LSYS\Database\Result{
 	}
     public function next()
     {
-        return $this->result&&$this->result->next();
+        $this->index++;
     }
     public function valid()
     {
-        return $this->result&&$this->result->valid();
+        if(!$this->result)return false;
+        return $this->result->data_seek($this->index);
     }
     public function nextRowset()
     {
@@ -58,15 +63,16 @@ class Result extends \LSYS\Database\Result{
     }
     public function rewind()
     {
-        return $this->result&&$this->result->rewind();
+        $this->index=0;
+        return true;
     }
     public function count()
     {
-        return $this->result&&$this->result->num_rows;
+        return $this->result?$this->result->num_rows:0;
     }
     public function key()
     {
-        return $this->result&&$this->result->key();
+        return $this->index;
     }
     public function __destruct()
     {
