@@ -35,15 +35,4 @@ return array(
             )
         ),
     ),
-    "pdo_sqlite"=>array(
-        //PDO Sqlite 配置
-        "type"=>\LSYS\Database\PDO\SQLite::class,
-        "table_prefix"=>"",
-        "connection"=>array(
-            'dsn'        => 'sqlite:/media/sf_htdocs/swoole/hi',
-            'persistent' => FALSE,
-            "variables"=>array(
-            )
-        ),
-    ),
 );

@@ -3,7 +3,7 @@ namespace TestLSYSDB;
 use PHPUnit\Framework\TestCase;
 use LSYS\Database\DI;
 use LSYS\Database;
-final class ConfigTest extends TestCase
+class ConfigTest extends TestCase
 {
     /**
      * @var Database

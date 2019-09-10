@@ -8,10 +8,12 @@
 namespace LSYS\Database\MYSQLi;
 use \LSYS\Database\Exception;
 use LSYS\Database\ConnectRetry;
+use LSYS\Database\EventManager\DBEvent;
 class Prepare extends \LSYS\Database\Prepare{
     protected $prepare;
     protected $connect;
     protected $affected_rows=0;
+    protected $insert_id=0;
     protected $query_sql;
     protected $query_map=[];
     protected function prepareCreate($allow_slave){
@@ -88,7 +90,7 @@ class Prepare extends \LSYS\Database\Prepare{
             foreach ($value as &$v) {
                 list($v,$type[])=$this->quote($v,$value_type);
             }
-            return [$value,empty($type)?"s":$type];
+            return [$value,empty($type)?"s":implode("", $type)];
         } elseif (is_int ( $value )) {
             return [$value,"i"];
         } elseif (is_float ( $value )) {
@@ -97,16 +99,25 @@ class Prepare extends \LSYS\Database\Prepare{
         return [strval($value),"s"];
     }
     protected function bindValue(){
+        if(empty($this->query_map))return [];
         $st=null;
-        $param=[&$st];
+        $param=[];
         foreach ($this->query_map as $v){
             $val=$this->value[$v]??null;
             list($val,$type)=$this->quote($val,$this->value_type[$v]??null);
             $st.=$type;
-            if(is_array($val))$param=array_merge($param,$val);
-            else $param[]=$val;
+            if(is_array($val)){
+                $param=array_merge($param,$val);
+            }else{
+                $param[]=$val;
+            }
         }
-        if(!is_null($st)&&!call_user_func_array(array($this->prepare,'bind_param'), $param)){
+        $refs = array();
+        foreach($param as $key => $_){
+            $_;$refs[$key] = &$param[$key];
+        }
+        array_unshift($refs, $st);
+        if(!is_null($st)&&!call_user_func_array(array($this->prepare,'bind_param'), $refs)){
             throw new Exception ($this->connect->error, $this->connect->errno);
         }
         return $param;
@@ -125,9 +136,11 @@ class Prepare extends \LSYS\Database\Prepare{
     }
     public function query(){
         while(true){
+            $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this->sql,false));
             $this->prepareCreate($this->slave_check&&$this->slave_check->allowSlave($this->sql));
             $this->bindValue();
             if(!@$this->prepare->execute()){
+                $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this->sql,false));
                 if($this->reConnect()){
                     $this->prepare=null;
                     $this->disConnect();
@@ -136,8 +149,10 @@ class Prepare extends \LSYS\Database\Prepare{
                     throw (new Exception($this->connect->error, $this->connect->errno))->setErrorSql($this->query_sql);
                 }
             }
+            $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlOk($this->sql,false));
             break;
         }
+        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlEnd($this->sql,false));
         return new Result($this->prepare->get_result(),function(){
             $this->prepare->next_result();
             return $this->prepare->get_result();
@@ -153,9 +168,11 @@ class Prepare extends \LSYS\Database\Prepare{
 	        $this->prepare=null;
 	    }
 	    while(true){
+	        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this->sql,true));
             $this->prepareCreate(false);
 	        $this->bindValue();
 	        if(!@$this->prepare->execute()){
+	            $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this->sql,true));
 	            if($this->reConnect()){
 	                $this->prepare=null;
 	                $this->disConnect();
@@ -164,11 +181,13 @@ class Prepare extends \LSYS\Database\Prepare{
 	                throw (new Exception($this->connect->error, $this->connect->errno))->setErrorSql($this->query_sql);
 	            }
 	        }
+	        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlOk($this->sql,true));
 	        break;
 	    }
 	    $this->slave_check&&$this->slave_check->execNotify($connect_mgr->schema($this->connect),$this->sql);
 	    $this->affected_rows=$this->connect->affected_rows;
 	    $this->insert_id=$this->connect->insert_id;
+	    $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlEnd($this->sql,true));
 	    return true;
 	}
 	/**
@@ -183,8 +202,7 @@ class Prepare extends \LSYS\Database\Prepare{
 	 * @return int
 	 */
 	public function insertId(){
-	    $connent=$this->connect->getConnect(ConnectManager::CONNECT_MASTER);
-	    return $connent->insert_id;
+	    return $this->insert_id;
 	}
 	/**
 	 * free result

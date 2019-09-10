@@ -7,9 +7,10 @@
  */
 namespace LSYS\Database;
 use LSYS\Database\PDO\Prepare as PPrepare;
+use LSYS\Database\EventManager\DBEvent;
 class PDO extends \LSYS\Database {
 	// PDO uses no quoting for identifiers
-	protected $_identifier = '';
+	protected $identifier = '';
 	protected $connection;
 	/**
 	 * @return \LSYS\Database\PDO\ConnectManager
@@ -33,6 +34,7 @@ class PDO extends \LSYS\Database {
 	public function beginTransaction($mode = NULL)
 	{
 		$connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
+		$this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionBegin($connent));
 		return $connent->beginTransaction();
 	}
 	/**
@@ -42,6 +44,7 @@ class PDO extends \LSYS\Database {
 	public function commit()
 	{
 	    $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
+	    $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionCommit($connent));
 		return $connent->commit();
 	}
 	/**
@@ -51,10 +54,13 @@ class PDO extends \LSYS\Database {
 	public function rollback()
 	{
 	    $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
+	    $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionRollback($connent));
 		return $connent->rollBack();
 	}
 	public function quote($value,$value_type=null) {
 	    if(is_string($value)||is_numeric($value)){
+	        if(is_int($value))return intval($value);
+	        if (is_float ( $value )) return sprintf ( '%F', $value );
 	        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_AUTO);
 	        return $connent->quote($value);
 	    }

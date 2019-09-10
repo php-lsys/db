@@ -17,17 +17,18 @@ class AsyncResult{
     }
     /**
      * result
+     * @param array||int $aysnc_index
      * @return Result
      */
     public function result($aysnc_index){
         if(is_array($aysnc_index)){
             $out=array();
             foreach ($aysnc_index as $index){
-                $out[$index]=$this->result($index);
+                $out[]=$this->result($index);
             }
             return $out;
         }
-        return $this->result[$aysnc_index+1]??null;
+        return $this->result[$aysnc_index-1]??null;
     }
     /**
      * return last query affected rows
@@ -41,7 +42,7 @@ class AsyncResult{
             }
             return $out;
         }
-        return $this->result[$aysnc_index+1]??0;
+        return $this->affected_rows[$aysnc_index-1]??0;
     }
     /**
      * return last insert auto id
@@ -55,6 +56,6 @@ class AsyncResult{
             }
             return $out;
         }
-        return $this->result[$aysnc_index+1]??false;
+        return $this->insert_id[$aysnc_index-1]??false;
     }
 }

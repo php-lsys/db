@@ -8,18 +8,32 @@ namespace LSYS\Database\EventManager;
 use LSYS\EventManager\Event;
 class DBEvent extends Event
 {
-    const QUERY_START="db.query.start";
-    const QUERY_OK="db.query.ok";
-    const QUERY_ERROR="db.query.error";
-    const QUERY_END="db.query.end";
-    const EXEC_START="db.exec.start";
-    const EXEC_OK="db.exec.ok";
-    const EXEC_ERROR="db.exec.error";
-    const EXEC_END="db.exec.end";
+    const SQL_START="db.sql.start";
+    const SQL_OK="db.sql.ok";
+    const SQL_BAD="db.sql.bad";
+    const SQL_END="db.sql.end";
     const TRANSACTION_BEGIN="db.transaction.begin";
     const TRANSACTION_COMMIT="db.transaction.commit";
     const TRANSACTION_ROLLBACK="db.transaction.rollback";
-    public static function queryStart($sql) {
-        return new self(self::QUERY_START,['sql'=>$sql]);
+    public static function sqlStart($sql,$exec) {
+        return new self(self::SQL_START,compact(func_get_argsname()));
+    }
+    public static function sqlOk($sql,$exec) {
+        return new self(self::SQL_OK,compact(func_get_argsname()));
+    }
+    public static function sqlBad($sql,$exec) {
+        return new self(self::SQL_BAD,compact(func_get_argsname()));
+    }
+    public static function sqlEnd($sql,$exec) {
+        return new self(self::SQL_END,compact(func_get_argsname()));
+    }
+    public static function transactionBegin($connent) {
+        return new self(self::TRANSACTION_BEGIN,compact(func_get_argsname()));
+    }
+    public static function transactionCommit($connent) {
+        return new self(self::TRANSACTION_COMMIT,compact(func_get_argsname()));
+    }
+    public static function transactionRollback($connent) {
+        return new self(self::TRANSACTION_ROLLBACK,compact(func_get_argsname()));
     }
 }

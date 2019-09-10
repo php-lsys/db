@@ -29,42 +29,13 @@ class Expr{
 		$this->value = $value;
 		$this->parameters = $parameters;
 	}
-	
-	/**
-	 * Bind a variable to a parameter.
-	 *
-	 * @param   string  $param  parameter key to replace
-	 * @param   mixed   $var    variable to use
-	 * @return  $this
-	 */
-	public function bind($param, & $var)
-	{
-		$this->parameters[$param] =& $var;
-	
-		return $this;
-	}
-	
-	/**
-	 * Set the value of a parameter.
-	 *
-	 * @param   string  $param  parameter key to replace
-	 * @param   mixed   $value  value to use
-	 * @return  $this
-	 */
-	public function param($param, $value)
-	{
-		$this->parameters[$param] = $value;
-	
-		return $this;
-	}
-	
 	/**
 	 * Add multiple parameter values.
 	 *
 	 * @param   array   $params list of parameter values
 	 * @return  $this
 	 */
-	public function parameters(array $params)
+	public function bindParam(array $params)
 	{
 		$this->parameters = $params + $this->parameters;
 	

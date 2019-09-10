@@ -10,8 +10,13 @@ use LSYS\Database\ConnectRetry;
 class MYSQLRWSConnectManager extends RWSConnectManager implements ConnectRetry{
 	protected $_try_num=0;
 	public function isReconnect($connect,$error_info){
-	    $errno=$error_info->errorCode();
-	    $msg=$error_info->errorInfo();
+	    if($error_info instanceof \PDOException ){
+	        $errno=$error_info->getCode();
+	        $msg=$error_info->getMessage();
+	    }else{
+	        $errno=$connect->errorCode();
+	        $msg=is_array($connect->errorInfo())?array_pop($connect->errorInfo()):null;
+	    }
 	    switch ($errno){
 	        case 'HY000':
 	            if(strpos($msg, '2006')||strpos($msg, '2013')){
@@ -37,7 +42,7 @@ class MYSQLRWSConnectManager extends RWSConnectManager implements ConnectRetry{
         foreach ( $variables as $var => $val ) {
             $_variables [] = 'SESSION ' . $var . ' = ' . $this->quote ( $val );
         }
-        $connect->exec('SET ' . implode ( ', ', $_variables ));
+        if(count($_variables)) $connect->exec('SET ' . implode ( ', ', $_variables ));
 	    return $connect;
 	}
 }

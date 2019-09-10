@@ -17,19 +17,16 @@ class ProfilerObserver implements EventObserver
     public function eventNotify(Event $event)
     {
         switch ($event->name()) {
-            case DBEvent::QUERY_START:
-            case DBEvent::EXEC_START:
+            case DBEvent::SQL_START:
                 $this->token = $this->profiler->start("Database",$event->eventargs()[0]);
                 break;
-            case DBEvent::QUERY_OK:
-            case DBEvent::EXEC_OK:
+            case DBEvent::SQL_OK:
                 if($this->token){
                     $this->profiler->stop($this->token);
                     $this->token=null;
                 }
                 break;
-            case DBEvent::QUERY_ERROR:
-            case DBEvent::EXEC_ERROR:
+            case DBEvent::SQL_BAD:
                 $this->token=null;
                 break;
         }
@@ -37,12 +34,9 @@ class ProfilerObserver implements EventObserver
     public function eventName()
     {
         return [
-            DBEvent::QUERY_START,
-            DBEvent::QUERY_OK,
-            DBEvent::QUERY_ERROR,
-            DBEvent::EXEC_START,
-            DBEvent::EXEC_OK,
-            DBEvent::EXEC_ERROR,
+            DBEvent::SQL_START,
+            DBEvent::SQL_OK,
+            DBEvent::SQL_BAD,
         ];
     }
 }
