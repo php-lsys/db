@@ -172,6 +172,8 @@ class MYSQLITest extends TestCase
     public function testRWCACHE() {
         $this->RUNRWCACHE(DI::get()->db("database.mysqli"),new \LSYS\Database\SlaveQueryCheck\Cache\Redis());
         $this->RUNRWCACHE(DI::get()->db("database.pdo_mysql"),new \LSYS\Database\SlaveQueryCheck\Cache\Redis());
+        $this->RUNRWCACHE(DI::get()->db("database.mysqli"),new \LSYS\Database\SlaveQueryCheck\Cache\Memcache());
+        $this->RUNRWCACHE(DI::get()->db("database.pdo_mysql"),new \LSYS\Database\SlaveQueryCheck\Cache\Memcache());
         $this->RUNRWCACHE(DI::get()->db("database.mysqli"),new \LSYS\Database\SlaveQueryCheck\Cache\Memcached());
         $this->RUNRWCACHE(DI::get()->db("database.pdo_mysql"),new \LSYS\Database\SlaveQueryCheck\Cache\Memcached());
     }
