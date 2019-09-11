@@ -6,7 +6,9 @@ php:
   
 before_install:
   - sudo apt-get install redis-server
+  - sudo service redis-server start
   - sudo apt-get install memcached
+  - sudo service memcached start
   - sudo apt-get install libmemcache-dev
   - wget https://pecl.php.net/get/memcached-3.0.4.tgz 
     && tar zfvx memcached-3.0.4.tgz 
