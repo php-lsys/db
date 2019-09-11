@@ -53,4 +53,15 @@ return array(
             )
         ),
     ),
+    "pdo_sqlite"=>array(
+        //PDO Sqlite 配置
+        "type"=>\LSYS\Database\PDO::class,
+        "table_prefix"=>"l_",
+        "connection"=>array(
+            'dsn'        => 'sqlite:'.dirname(__DIR__).'/db/hi.db',
+            'persistent' => FALSE,
+            "variables"=>array(
+            )
+        ),
+    ),
 );

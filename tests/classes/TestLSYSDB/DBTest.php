@@ -8,6 +8,7 @@ use LSYS\Database\Result;
 use LSYS\EventManager\EventCallback;
 use LSYS\Database\EventManager\DBEvent;
 use LSYS\Database\EventManager\ProfilerObserver;
+use LSYS\Database\ConnectManager;
 class MYSQLITest extends TestCase
 {
     public function testinit(){
@@ -51,6 +52,7 @@ class MYSQLITest extends TestCase
     }
     public function testCURD() {
         $this->runCURD(DI::get()->db("database.mysqli"));
+        $this->runCURD(DI::get()->db("database.pdo_sqlite"));
         $this->runCURD(DI::get()->db("database.pdo_mysql"));
     }
     protected function runCURD(Database $db) {
@@ -70,9 +72,7 @@ class MYSQLITest extends TestCase
         ], function(\LSYS\EventManager\Event $e){
             $this->assertTrue(boolval($e->data("connent")));
         }));
-        $db = Database::factory(\LSYS\Config\DI::get()->config("database.mysqli"))
-            ->setEventManager(\LSYS\EventManager\DI::get()->eventManager())
-        ;
+        $db->setEventManager(\LSYS\EventManager\DI::get()->eventManager());
         
         $table_name=$db->quoteTable("order");
         $column=$db ->quoteColumn('sn');
@@ -112,9 +112,9 @@ class MYSQLITest extends TestCase
         //事务确认
         $db->beginTransaction();
         $db->exec($sql);
-        $bid=$db->insertId();
+        $idd=$db->insertId();
         $db->commit();
-        $bid=$db->quote($bid);
+        $bid=$db->quote($idd);
         $res=$db->query("select * from {$table_name} where id={$bid}");
         $res->setFetchMode(Result::FETCH_OBJ);
         $this->assertTrue($res->current() instanceof \stdClass);
@@ -129,7 +129,8 @@ class MYSQLITest extends TestCase
         $rid=$db->insertId();
         $db->rollback();
         $rid=$db->quote($rid);
-        $res=$db->query("select * from {$table_name} where id={$rid}");
+        $tsql="select * from {$table_name} where id={$rid}";
+        $res=$db->query($tsql);
         $this->assertEquals($res->count(), "0");
         
         
@@ -155,17 +156,27 @@ class MYSQLITest extends TestCase
         
         
         $dsql="delete from {$table_name} where id=:id";
-        $result=$db->exec($dsql,array(":id"=>$bid));
-        if ($result)$this->assertTrue($db->affectedRows()>0);
+        $result=$db->exec($dsql,array(":id"=>$idd));
+        $this->assertTrue($db->affectedRows()>0);
+        //exception
         
+        try{
+            $sql="wrong sql";
+            $db->query($sql);
+        }catch (\LSYS\Database\Exception $e){
+            $this->assertEquals($e->getErrorSql(),$sql);
+        }
         
     }
+    
     public function testRWCACHE() {
-        $this->RUNRWCACHE(DI::get()->db("database.mysqli"));
-        $this->RUNRWCACHE(DI::get()->db("database.pdo_mysql"));
+        $this->RUNRWCACHE(DI::get()->db("database.mysqli"),new \LSYS\Database\SlaveQueryCheck\Cache\Redis());
+        $this->RUNRWCACHE(DI::get()->db("database.pdo_mysql"),new \LSYS\Database\SlaveQueryCheck\Cache\Redis());
+        $this->RUNRWCACHE(DI::get()->db("database.mysqli"),new \LSYS\Database\SlaveQueryCheck\Cache\Memcached());
+        $this->RUNRWCACHE(DI::get()->db("database.pdo_mysql"),new \LSYS\Database\SlaveQueryCheck\Cache\Memcached());
     }
-    public function RUNRWCACHE(Database $db) {
-        $slave=new \LSYS\Database\SlaveQueryCheck(new \LSYS\Database\SlaveQueryCheck\Cache\Redis());
+    public function RUNRWCACHE(Database $db,$cache) {
+        $slave=new \LSYS\Database\SlaveQueryCheck($cache);
         $table_name=$db->quoteTable("order");
         $this->assertTrue($slave->allowSlave("select * from test"));
         $db->setSlaveQueryCheck($slave);
