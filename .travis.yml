@@ -3,6 +3,8 @@ services:
   - mysql
 php:
   - 7.1
+  - 7.2
+  - 7.3
   
 before_install:
   - sudo apt-get install redis-server
