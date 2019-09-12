@@ -29,6 +29,7 @@ class Prepare extends \LSYS\Database\Prepare{
                 if ($v instanceof \LSYS\Database\Expr) {
                     $v=$v->compile($this->db);
                     $index_expr[$p]=$v;
+                    array_pop($val);
                 }
                 continue;
             }
@@ -45,14 +46,13 @@ class Prepare extends \LSYS\Database\Prepare{
                 if ($v instanceof \LSYS\Database\Expr) {
                     $v=$v->compile($this->db);
                     $fill[$k]=$v;
+                    array_pop($val);
                 }else{
                     $fill[$k]="?";
                 }
             }
         }
         //实际请求预编译SQL
-        ksort($val);
-        $this->query_map=array_values($val);
         $op=0;
         foreach ($index_expr as $k=>$v){
             $sql=substr_replace($sql, $v, $k+$op,1);
@@ -61,6 +61,8 @@ class Prepare extends \LSYS\Database\Prepare{
         if(count($fill)){
             $sql=strtr($sql,$fill);
         }
+        ksort($val);
+        $this->query_map=array_values($val);
         if ($this->prepare) {//存在预编译
             if($sql===$this->query_sql)return;//请求SQL相同
         }

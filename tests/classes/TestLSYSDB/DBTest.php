@@ -216,4 +216,17 @@ class MYSQLITest extends TestCase
         $result= $db->query($sql,[":id"=>"764"]);
         $this->assertTrue($result instanceof Result);
     }
+    public function testExpr() {
+        $this->runExpr(DI::get()->db("database.mysqli"));
+        $this->runExpr(DI::get()->db("database.pdo_mysql"));
+    }
+    public function runExpr(Database $db) {
+        $table_name=$db->quoteTable("order");
+        $sql="select * from {$table_name} where id in :id";
+        $result= $db->query($sql,[":id"=>Database::expr("(1,2)")]);
+        $this->assertTrue($result instanceof Result);
+        $sql="UPDATE {$table_name} SET sn=:sn WHERE id>0";
+        $result= $db->exec($sql,[":sn"=>Database::expr("CONCAT(sn,'hi')")]);
+        $this->assertTrue($result);
+    }
 }

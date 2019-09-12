@@ -6,7 +6,7 @@
  * @license    http://www.apache.org/licenses/LICENSE-2.0
  */
 namespace LSYS\Database;
-class Expr{
+class Expr implements \JsonSerializable{
 
 	// Unquoted parameters
 	protected $parameters;
@@ -95,4 +95,18 @@ class Expr{
 	
 		return $value;
 	}
+    public function jsonSerialize()
+    {
+        $db = \LSYS\Database\DI::get()->db();
+        $value = $this->value();
+        if ( ! empty($this->parameters))
+        {
+            // Quote all of the parameter values
+            $params = array_map(array($db, 'quote'), $this->parameters);
+            
+            // Replace the values in the expression
+            $value = strtr($value, $params);
+        }
+        return $value;
+    }
 }
