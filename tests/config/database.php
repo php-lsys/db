@@ -9,6 +9,8 @@ return array(
 			'hostname' => '127.0.0.1',
 			'username' => 'root',
 			'password' => '',
+		    "try_re_num"=>"2",
+		    "try_re_sleep"=>"1",
 			'persistent' => FALSE,
 			"variables"=>array(
 			),
@@ -30,6 +32,8 @@ return array(
         "type"=>\LSYS\Database\PDO\MYSQL::class,
         "charset"=>"UTF8",
         "table_prefix"=>"l_",
+        "try_re_num"=>"2",
+        "try_re_sleep"=>"1",
         "connection"=>array(
             //单数据库使用此配置
             'dsn'        => 'mysql:host=127.0.0.1;dbname=test;',

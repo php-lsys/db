@@ -12,6 +12,8 @@ return array(
         "type"=>\LSYS\Database\PDO::class,
         "charset"=>"UTF8",
         "table_prefix"=>"",
+        "try_re_num"=>"10",
+        "try_re_sleep"=>"1",
         "connection"=>array(
             //单数据库使用此配置
             'dsn'        => 'mysql:host=127.0.0.1;dbname=lsys;',

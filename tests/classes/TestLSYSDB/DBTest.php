@@ -7,8 +7,6 @@ use LSYS\Database\AsyncQuery;
 use LSYS\Database\Result;
 use LSYS\EventManager\EventCallback;
 use LSYS\Database\EventManager\DBEvent;
-use LSYS\Database\EventManager\ProfilerObserver;
-use LSYS\Database\ConnectManager;
 class MYSQLITest extends TestCase
 {
     public function testinit(){
@@ -202,5 +200,18 @@ class MYSQLITest extends TestCase
         $this->assertFalse($slave->allowSlave("select * from temp where id in (select id from {$table_name})"));
         $this->assertFalse($slave->allowSlave("desc {$table_name}"));
         $this->assertFalse($slave->allowSlave("show table {$table_name}"));
+    }
+    public function testReconn() {
+        $this->runCURD(DI::get()->db("database.mysqli"));
+        $this->runCURD(DI::get()->db("database.pdo_mysql"));
+    }
+    public function runReconn(Database $db) {
+        
+        $table_name=$db->quoteTable("order");
+        $sql="select * from {$table_name} where id>=:id";
+        $db->query($sql,[":id"=>"764"]);
+        `sudo service mysql restart`;
+        $result= $db->query($sql,[":id"=>"764"]);
+        $this->assertTrue($result instanceof Result);
     }
 }

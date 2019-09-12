@@ -8,7 +8,7 @@
 namespace LSYS\Database\PDO;
 use LSYS\Database\ConnectRetry;
 class MYSQLRWSConnectManager extends RWSConnectManager implements ConnectRetry{
-	protected $_try_num=0;
+    protected $try_num=0;
 	public function isReconnect($connect,$error_info){
 	    if($error_info instanceof \PDOException ){
 	        $errno=$error_info->getCode();
