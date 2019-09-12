@@ -18,6 +18,9 @@ class MYSQLITest extends TestCase
         $this->assertTrue($db instanceof Database);
         $db = Database::factory(\LSYS\Config\DI::get()->config($config));
         $this->assertTrue($db instanceof Database);
+        $this->assertFalse($db->getConnectManager()->isConnected());
+        $db->getConnectManager()->getConnect();
+        $this->assertTrue($db->getConnectManager()->isConnected());
     }
     public function testQuote() {
         $this->runQuote(DI::get()->db("database.mysqli"));
@@ -206,7 +209,6 @@ class MYSQLITest extends TestCase
         $this->runCURD(DI::get()->db("database.pdo_mysql"));
     }
     public function runReconn(Database $db) {
-        
         $table_name=$db->quoteTable("order");
         $sql="select * from {$table_name} where id>=:id";
         $db->query($sql,[":id"=>"764"]);
