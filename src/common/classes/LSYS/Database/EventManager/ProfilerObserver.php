@@ -11,14 +11,14 @@ class ProfilerObserver implements EventObserver
 {
     protected $profiler;
     protected $token;
-    public function __construct(\LSYS\Profiler $profiler){
-        $this->profiler=$profiler;
+    public function __construct(\LSYS\Profiler $profiler=null){
+        $this->profiler=$profiler?$profiler:\LSYS\Profiler\DI::get()->profiler();
     }
     public function eventNotify(Event $event)
     {
-        switch ($event->name()) {
+        switch ($event->getName()) {
             case DBEvent::SQL_START:
-                $this->token = $this->profiler->start("Database",$event->eventargs()[0]);
+                $this->token = $this->profiler->start("Database",$event->data("sql"));
                 break;
             case DBEvent::SQL_OK:
                 if($this->token){

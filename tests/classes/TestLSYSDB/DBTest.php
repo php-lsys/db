@@ -7,6 +7,7 @@ use LSYS\Database\AsyncQuery;
 use LSYS\Database\Result;
 use LSYS\EventManager\EventCallback;
 use LSYS\Database\EventManager\DBEvent;
+use LSYS\Database\EventManager\ProfilerObserver;
 class MYSQLITest extends TestCase
 {
     public function testinit(){
@@ -228,5 +229,20 @@ class MYSQLITest extends TestCase
         $sql="UPDATE {$table_name} SET sn=:sn WHERE id>0";
         $result= $db->exec($sql,[":sn"=>Database::expr("CONCAT(sn,'hi')")]);
         $this->assertTrue($result);
+    }
+    public function testProfiler() {
+        $this->runProfiler(DI::get()->db("database.mysqli"));
+        $this->runProfiler(DI::get()->db("database.pdo_mysql"));
+    }
+    public function runProfiler(Database $db) {
+        $eventm=\LSYS\EventManager\DI::get()->eventManager();
+        $eventm->attach(new ProfilerObserver());
+        $db->setEventManager($eventm);
+        $table_name=$db->quoteTable("order");
+        $sql="select * from {$table_name} where id = :id";
+        $db->query($sql,[":id"=>1]);
+        $sql="select sleep(1) as t";
+        $db->query($sql);
+        $this->assertTrue(\LSYS\Profiler\DI::get()->profiler()->appTotal()[0]>1000);//总耗时肯定大于1秒
     }
 }
