@@ -8,6 +8,7 @@
 namespace LSYS\Database\PDO;
 use LSYS\Database\Exception;
 use LSYS\Database\ConnectRetry;
+use LSYS\Database\EventManager\DBEvent;
 /**
  * @property \LSYS\Database\PDO $db
  */
@@ -29,7 +30,11 @@ class Prepare extends \LSYS\Database\Prepare{
                         if($p===false)break;
                         if($k>=$f)break;
                     }
-                    if($p===false)continue;
+                    if($p===false){
+                        $v=serialize($v);
+                        trigger_error("? not match [{$v}]",E_USER_NOTICE);
+                        continue;
+                    }
                     if($v instanceof \LSYS\Database\Expr){
                         $v=$v->compile($this->db);
                         $sql=substr_replace($sql, $v,$p,1);
@@ -129,51 +134,85 @@ class Prepare extends \LSYS\Database\Prepare{
         $connect_mgr->disconnect($this->connect);
         $this->connect=null;
     }
-    protected function reConnect(){
+    protected function reConnect($e=null){
         if(!$this->connect)return ;
         $connect_mgr=$this->db->getConnectManager();
         return $connect_mgr instanceof ConnectRetry
         &&!$this->db->inTransaction()
-        &&$connect_mgr->isReconnect($this->connect);
+        &&$connect_mgr->isReconnect($this->connect,$e);
     }
     protected function bindValues(){
         foreach ($this->value as $k=>$v){
-            $this->bindValue($k,$v,$this->value_type[$v]??null);
+            assert(!is_array($v));
+            $this->bindValue($k,$v,$this->value_type[$k]??null);
         }
     }
     public function exec(){
         while(true){
+            $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this->sql,true));
             $this->prepareCreate(false);
             $this->bindValues();
-            if(!@$this->prepare->execute()){
+            try{
+                $exec=$this->prepare->execute();
+            }catch (\PDOException $e){
+                $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this->sql,true));
+                if($this->reConnect($e)){
+                    $this->prepare=null;
+                    $this->disConnect();
+                    continue;
+                }else{
+                    throw (new Exception($e->getMessage(), $e->getCode()))->setErrorSql($this->query_sql);
+                }
+            }
+            if(!$exec){
+                $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this->sql,true));
                 if($this->reConnect()){
                     $this->prepare=null;
                     $this->disConnect();
                     continue;
                 }else{
-                    throw (new Exception($this->connect->error, $this->connect->errno))->setErrorSql($this->query_sql);
+                    throw (new Exception(json_encode($this->connect->errorInfo(),JSON_UNESCAPED_UNICODE), $this->connect->errorCode()))->setErrorSql($this->query_sql);
                 }
             }
+            $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlOk($this->sql,true));
             break;
         }
+        $this->slave_check&&$this->slave_check->execNotify($this->db->getConnectManager()->schema($this->connect),$this->query_sql);
         $this->insert_id=$this->connect->lastInsertId();
+        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlEnd($this->sql,true));
         return true;
     }
     public function query(){
         while(true){
+            $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this->sql,false));
             $this->prepareCreate($this->slave_check&&$this->slave_check->allowSlave($this->sql));
-            $this->bindValue();
-            if(!@$this->prepare->execute()){
+            $this->bindValues();
+            try{
+                $exec=$this->prepare->execute();
+            }catch (\PDOException $e){
+                $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this->sql,false));
+                if($this->reConnect($e)){
+                    $this->prepare=null;
+                    $this->disConnect();
+                    continue;
+                }else{
+                    throw (new Exception($e->getMessage(), $e->getCode()))->setErrorSql($this->query_sql);
+                }
+            }
+            if(!$exec){
+                $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this->sql,false));
                 if($this->reConnect()){
                     $this->prepare=null;
                     $this->disConnect();
                     continue;
                 }else{
-                    throw (new Exception($this->connect->error, $this->connect->errno))->setErrorSql($this->query_sql);
+                    throw (new Exception(json_encode($this->connect->errorInfo(),JSON_UNESCAPED_UNICODE), $this->connect->errorCode()))->setErrorSql($this->query_sql);
                 }
             }
+            $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlOk($this->sql,false));
             break;
         }
+        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlEnd($this->sql,false));
         return new Result($this->prepare);
     }
     public function lastQuery(){
@@ -184,9 +223,9 @@ class Prepare extends \LSYS\Database\Prepare{
         return $this->prepare?$this->prepare->rowCount():0;
     }
     public function insertId(){
-        return $this->prepare?$this->prepare->rowCount():0;
+        return $this->insert_id;
     }
     public function __destruct(){
-        $this->_result&&$this->_result->closeCursor();
+        $this->prepare&&$this->prepare->closeCursor();
     }
 }

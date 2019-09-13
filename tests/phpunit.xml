@@ -2,12 +2,20 @@
 <phpunit bootstrap="autoload.php">
     <testsuites>
         <testsuite name="LSYS Tests">
-            <directory suffix="Test.php">./classes/LSYS</directory>
+            <directory suffix="Test.php">./classes/TestLSYSDB</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-         	<directory suffix=".php">../src/classes</directory>
+         	<directory suffix=".php">../src/common/classes</directory>
+         	<directory suffix=".php">../src/config-db/classes</directory>
+         	<directory suffix=".php">../src/driver-mysqli/classes</directory>
+         	<directory suffix=".php">../src/driver-pdo/classes</directory>
+         	<directory suffix=".php">../src/driver-pdo-mysql/classes</directory>
+         	<directory suffix=".php">../src/driver-pdo-postgresql/classes</directory>
+         	<directory suffix=".php">../src/slave-query-check-cache-memcache/classes</directory>
+         	<directory suffix=".php">../src/slave-query-check-cache-memcached/classes</directory>
+         	<directory suffix=".php">../src/slave-query-check-cache-redis/classes</directory>
         </whitelist>
     </filter>
     <logging>

@@ -6,39 +6,34 @@
  */
 namespace LSYS\Database\EventManager;
 use LSYS\EventManager\Event;
-use LSYS\Database;
 class DBEvent extends Event
 {
-    //SWOOLE 事件列表 $swoole_event 变量得取值
-    const QUERY_START=1;
-    const QUERY_OK=2;
-    const QUERY_ERROR=3;
-    const QUERY_END=4;
-    const EXEC_START=5;
-    const EXEC_OK=6;
-    const EXEC_ERROR=7;
-    const EXEC_END=8;
-    const TRANSACTION_BEGIN=9;
-    const TRANSACTION_COMMIT=10;
-    const TRANSACTION_ROLLBACK=11;
-    protected $db;
-    protected $event;
-    protected $args;
-    public function __construct(Database $db,$event_name,$args) {
-        $this->db=$db;
-        $this->event=$event_name;
-        $this->args=$args;
+    const SQL_START="db.sql.start";
+    const SQL_OK="db.sql.ok";
+    const SQL_BAD="db.sql.bad";
+    const SQL_END="db.sql.end";
+    const TRANSACTION_BEGIN="db.transaction.begin";
+    const TRANSACTION_COMMIT="db.transaction.commit";
+    const TRANSACTION_ROLLBACK="db.transaction.rollback";
+    public static function sqlStart($sql,$exec) {
+        return new self(self::SQL_START,compact(func_get_argsname()));
     }
-    public function name(){
-        return $this->event;
+    public static function sqlOk($sql,$exec) {
+        return new self(self::SQL_OK,compact(func_get_argsname()));
     }
-    public function db(){
-        return $this->db;
+    public static function sqlBad($sql,$exec) {
+        return new self(self::SQL_BAD,compact(func_get_argsname()));
     }
-    /**
-     * @return array
-     */
-    public function eventArgs(){
-        return is_array($this->args)?$this->args:[];
+    public static function sqlEnd($sql,$exec) {
+        return new self(self::SQL_END,compact(func_get_argsname()));
+    }
+    public static function transactionBegin($connent) {
+        return new self(self::TRANSACTION_BEGIN,compact(func_get_argsname()));
+    }
+    public static function transactionCommit($connent) {
+        return new self(self::TRANSACTION_COMMIT,compact(func_get_argsname()));
+    }
+    public static function transactionRollback($connent) {
+        return new self(self::TRANSACTION_ROLLBACK,compact(func_get_argsname()));
     }
 }

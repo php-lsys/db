@@ -7,6 +7,7 @@
  */
 namespace LSYS\Database\PDO;
 class MYSQL extends RWSPDO {
+    protected $identifier = '`';
     public function getConnectManager()
     {
         if(!$this->connection) $this->connection= new \LSYS\Database\PDO\MYSQLRWSConnectManager($this->config);

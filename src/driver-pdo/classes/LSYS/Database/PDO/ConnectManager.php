@@ -7,7 +7,7 @@
  */
 namespace LSYS\Database\PDO;
 use LSYS\Database\Exception;
-abstract class ConnectManager extends \LSYS\Database\ConnectManager {
+class ConnectManager extends \LSYS\Database\ConnectManager {
 	protected $connection;
 	protected $schema;
 	protected function getSchema(array $link_config){

@@ -26,7 +26,6 @@ class Result extends \LSYS\Database\Result{
 	{
 	    $this->result=$result;
 	    $this->total_rows = $this->result->rowCount();
-	    if($this->total_rows==0)$this->init();
 	}
 	public function setFetchMode($mode,$classname=NULL, array $ctorargs=NULL){
 	    parent::setFetchMode($mode,$classname,$ctorargs);
@@ -72,6 +71,7 @@ class Result extends \LSYS\Database\Result{
 	        $this->total_rows=count($this->cache_rows);
 	    }else{
 	        $this->fetch();
+	        if(is_null($this->row))$this->total_rows=0;//SQLLITE PDO 存在BUG
 	    }
 	}
 	/**

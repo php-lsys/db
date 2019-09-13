@@ -6,6 +6,8 @@
  * @license    http://www.apache.org/licenses/LICENSE-2.0
  */
 namespace LSYS\Database;
+use LSYS\Database\EventManager\DBEvent;
+
 class MYSQLi extends \LSYS\Database implements AsyncQuery {
     protected $identifier = '`';
 	// 已连接的数据库
@@ -58,6 +60,7 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
             throw new Exception ($connent->error, $connent->errno  );
         }
         $this->in_transaction=true;
+        $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionBegin($connent));
         return (bool) $connent->query('START TRANSACTION');
     }
     /**
@@ -76,6 +79,7 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
         $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
         // Make sure the database is connected
 		$this->in_transaction=false;
+		$this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionCommit($connent));
 		return (bool) $connent->query('COMMIT');
     }
    /**
@@ -87,6 +91,7 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
         $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
         // Make sure the database is connected
         $this->in_transaction=false;
+        $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionRollback($connent));
         return (bool) $connent->query('ROLLBACK');
     }
     protected function asyncAdd($is_exec,$sql, array $value = [], array $value_type = []){
@@ -137,7 +142,7 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
             if($is_exec){
                 $_aff_row=$conn->affected_rows;
                 $_ins=$conn->insert_id;
-                $_result=null;
+                $_result=$sql_result;
             }else{
                 $_result=new \LSYS\Database\MYSQLi\Result($sql_result);
                 $_aff_row=0;

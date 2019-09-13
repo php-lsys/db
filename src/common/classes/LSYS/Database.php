@@ -36,8 +36,8 @@ abstract class Database{
 	 * @param string $value
 	 * @return \LSYS\Database\Expr
 	 */
-	public static function expr($value) {
-	    return new Database\Expr ( $value );
+	public static function expr($value, $parameters = array()) {
+	    return new Database\Expr ( $value,$parameters );
 	}
 	/**
 	 * @var Config

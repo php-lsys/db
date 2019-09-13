@@ -9,9 +9,11 @@
 return array(
     "pdo_mysql"=>array(
         //PDO MYSQL 配置
-        "type"=>\LSYS\Database\PDO\MYSQL::class,
+        "type"=>\LSYS\Database\PDO::class,
         "charset"=>"UTF8",
         "table_prefix"=>"",
+        "try_re_num"=>"10",
+        "try_re_sleep"=>"1",
         "connection"=>array(
             //单数据库使用此配置
             'dsn'        => 'mysql:host=127.0.0.1;dbname=lsys;',
@@ -22,25 +24,13 @@ return array(
             "variables"=>array(
             ),
         ),
-        //读写分离中只读数据库
-        'slave_connection'=>array(
-            array(
-                'dsn'        => 'mysql:host=127.0.0.1;dbname=lsys;',
-                'username'   => 'root',
-                'password'   => "110",
-                'weight'	 => 1,
-                'persistent' => FALSE,
-                "variables"=>array(
-                )
-            )
-        ),
     ),
     "pdo_sqlite"=>array(
         //PDO Sqlite 配置
-        "type"=>\LSYS\Database\PDO\SQLite::class,
+        "type"=>\LSYS\Database\PDO::class,
         "table_prefix"=>"",
         "connection"=>array(
-            'dsn'        => 'sqlite:/media/sf_htdocs/swoole/hi',
+            'dsn'        => 'sqlite:/your_sqlite_path/dbname',
             'persistent' => FALSE,
             "variables"=>array(
             )

@@ -122,7 +122,7 @@ class Simple implements Parse {
     /**
      * @return array $table
      */
-    public function execParseTable($type,$sql){
+    public function execParseTable($sql){
         $table=[];
         $sqls=preg_split('/\s|=|\(|\)|,/', trim($sql));
         switch (strtolower(array_shift($sqls))){
