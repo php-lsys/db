@@ -59,9 +59,10 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
         {
             throw new Exception ($connent->error, $connent->errno  );
         }
-        $this->in_transaction=true;
         $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionBegin($connent));
-        return (bool) $connent->query('START TRANSACTION');
+        $status = (bool) $connent->query('START TRANSACTION');
+        $this->in_transaction=true;
+        return $status;
     }
     /**
      * {@inheritDoc}
@@ -78,9 +79,11 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
     {
         $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
         // Make sure the database is connected
-		$this->in_transaction=false;
+		
 		$this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionCommit($connent));
-		return (bool) $connent->query('COMMIT');
+		$status = (bool) $connent->query('COMMIT');
+		$this->in_transaction=false;
+		return $status;
     }
    /**
     * {@inheritDoc}
@@ -90,9 +93,10 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
     {
         $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
         // Make sure the database is connected
-        $this->in_transaction=false;
         $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionRollback($connent));
-        return (bool) $connent->query('ROLLBACK');
+        $status = (bool) $connent->query('ROLLBACK');
+        $this->in_transaction=false;
+        return $status;
     }
     protected function asyncAdd($is_exec,$sql, array $value = [], array $value_type = []){
         $this->last_query = $sql;
