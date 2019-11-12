@@ -9,6 +9,9 @@ namespace LSYS\Database\MYSQLi;
 use \LSYS\Database\Exception;
 use LSYS\Database\ConnectRetry;
 use LSYS\Database\EventManager\DBEvent;
+/**
+ * @property-read \LSYS\Database\MYSQLi $db
+ */
 class Prepare extends \LSYS\Database\Prepare{
     protected $prepare;
     protected $connect;

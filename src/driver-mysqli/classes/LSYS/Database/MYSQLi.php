@@ -155,4 +155,41 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
         }
         return new AsyncResult($result,$aff_row,$insert);
     }
+    
+    /**
+     * Perform an SQL query of the given type.
+     *
+     * @param   integer  $type
+     * @param   string   $sql        SQL query
+     * @return  Result
+     */
+    public function query($sql,array $value=[],array $value_type=[]){
+        try{
+            return parent::query($sql,$value,$value_type);
+        }catch (Exception $e){//unlink connect reset transaction status
+            if ($this->getConnectManager()->isUnConnect($e->getCode())) {
+                $this->in_transaction=false;
+            }
+            throw $e;
+        }
+    }
+    /**
+     * Perform an SQL query of the given type.
+     *
+     * @param   integer  $type
+     * @param   string   $sql        SQL query
+     * @return  bool
+     */
+    public function exec($sql,array $value=[],array $value_type=[]){
+        try{
+            return parent::query($sql,$value,$value_type);
+        }catch (Exception $e){//unlink connect reset transaction status
+            if ($this->getConnectManager()->isUnConnect($e->getCode())) {
+                $this->in_transaction=false;
+            }
+            throw $e;
+        }
+    }
+    
+    
 }

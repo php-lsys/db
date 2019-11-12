@@ -71,7 +71,7 @@ class ConnectManager  extends \LSYS\Database\ConnectManager implements ConnectRe
 	 * @param \mysqli $connection
 	 */
 	public function isReConnect($error_object,$error_info){
-		if($error_object->errno == 2006||$error_object->errno == 2013){
+	    if($this->isUnConnect($error_object->errno)){
 		    $try_re_num=$this->config->get("try_re_num",0);
 		    if($try_re_num==0)return false;
 		    if($this->try_num<$try_re_num){
@@ -86,6 +86,15 @@ class ConnectManager  extends \LSYS\Database\ConnectManager implements ConnectRe
 		}
 		return false;
 	}
+	/**
+	 * 是否是断开连接
+	 * @param object $error_object
+	 * @return boolean
+	 */
+	public function isUnConnect($errno){
+	    return $errno == 2006||$errno == 2013;
+	}
+	
 	public function disConnect($connection=null){
 	    $status = TRUE;
 	    if ($connection===null){
