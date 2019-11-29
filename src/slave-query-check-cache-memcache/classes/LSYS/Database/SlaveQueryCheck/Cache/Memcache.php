@@ -38,7 +38,12 @@ class Memcache implements Cache{
         $memcache=$this->memcache();
         if (!is_object($memcache)) return true;
         foreach ($table as $v){
-            if(intval($memcache->get($this->prefix.$v))>time())return true;
+            try{
+                if(intval($memcache->get($this->prefix.$v))>time())return true;
+            }catch (\LSYS\Exception $e){
+                is_callable($this->log)&&call_user_func($this->log,$e);
+                return true;
+            }
         }
     }
     public function save(array $table){
@@ -46,7 +51,11 @@ class Memcache implements Cache{
         if (!is_object($memcache)) return;
         $delayed=$this->delayed();
         foreach ($table as $v){
-            $memcache->set($this->prefix.$v,time()+$delayed,0,$delayed);
+            try{
+                $memcache->set($this->prefix.$v,time()+$delayed,0,$delayed);
+            }catch (\LSYS\Exception $e){
+                is_callable($this->log)&&call_user_func($this->log,$e);
+            }
         }
     }
     public function delayed(){
