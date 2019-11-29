@@ -17,7 +17,7 @@ class Prepare extends \LSYS\Database\Prepare{
     protected $prepare;
     protected $connect;
     protected $insert_id;
-    protected function prepareCreate($allow_slave){
+    protected function prepareCreate($exec,$allow_slave){
         $sql=$this->sql;
         $arrv=$irm=$earrv=[];
         foreach ($this->value??[] as $k=>$v){
@@ -99,7 +99,9 @@ class Prepare extends \LSYS\Database\Prepare{
         }
         $this->query_sql=$sql;//解析完SQL
         $connect_mgr=$this->db->getConnectManager();
-        $this->connect=$connect_mgr->getConnect($allow_slave?ConnectManager::CONNECT_SLAVE:ConnectManager::CONNECT_MASTER);
+        $this->connect=$connect_mgr->getConnect($exec?ConnectManager::CONNECT_MASTER_MUST:(
+            $allow_slave?ConnectManager::CONNECT_SLAVE:ConnectManager::CONNECT_MASTER_SUGGEST
+            ));
         try{
             $result = $this->connect->prepare($this->query_sql);
         }catch (\Exception $e)
@@ -150,7 +152,7 @@ class Prepare extends \LSYS\Database\Prepare{
     public function exec(){
         while(true){
             $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this->sql,true));
-            $this->prepareCreate(false);
+            $this->prepareCreate(true,false);
             $this->bindValues();
             try{
                 $exec=$this->prepare->execute();
@@ -185,7 +187,7 @@ class Prepare extends \LSYS\Database\Prepare{
     public function query(){
         while(true){
             $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this->sql,false));
-            $this->prepareCreate($this->slave_check&&$this->slave_check->allowSlave($this->sql));
+            $this->prepareCreate(false,$this->slave_check&&$this->slave_check->allowSlave($this->sql));
             $this->bindValues();
             try{
                 $exec=$this->prepare->execute();

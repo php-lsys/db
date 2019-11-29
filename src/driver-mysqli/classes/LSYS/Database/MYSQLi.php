@@ -53,7 +53,7 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
      */
     public function beginTransaction($mode = NULL)
     {
-        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
+        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST);
         // Make sure the database is connected
         if ($mode AND ! $connent->query( "SET TRANSACTION ISOLATION LEVEL $mode"))
         {
@@ -77,7 +77,7 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
      */
     public function commit()
     {
-        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
+        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST);
         // Make sure the database is connected
 		
 		$this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionCommit($connent));
@@ -91,7 +91,7 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
     */
     public function rollback()
     {
-        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
+        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST);
         // Make sure the database is connected
         $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionRollback($connent));
         $status = (bool) $connent->query('ROLLBACK');
@@ -107,8 +107,14 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
         $sql=strtr($sql,$param);
         $connect_mgr=$this->getConnectManager();
         while(true){
-            if(count($this->async))$conn=$connect_mgr->createConnect($is_exec?ConnectManager::CONNECT_MASTER:ConnectManager::CONNECT_AUTO);
-            else $conn=$connect_mgr->getConnect($is_exec?ConnectManager::CONNECT_MASTER:ConnectManager::CONNECT_AUTO);
+            if($is_exec)$conn_type=ConnectManager::CONNECT_MASTER_MUST;
+            else{
+                if($this->slave_check&&$this->slave_check->allowSlave($sql))$conn_type=ConnectManager::CONNECT_SLAVE;
+                else $conn_type=ConnectManager::CONNECT_MASTER_SUGGEST;
+            }
+            if(count($this->async)){
+                $conn=$connect_mgr->createConnect($conn_type);
+            }else $conn=$connect_mgr->getConnect($conn_type);
             $res=$conn->query($sql, MYSQLI_ASYNC);
             if($res===false){
                 if($connect_mgr instanceof ConnectRetry

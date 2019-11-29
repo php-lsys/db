@@ -33,7 +33,7 @@ class PDO extends \LSYS\Database {
 	 */
 	public function beginTransaction($mode = NULL)
 	{
-		$connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
+		$connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST);
 		$this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionBegin($connent));
 		return $connent->beginTransaction();
 	}
@@ -43,7 +43,7 @@ class PDO extends \LSYS\Database {
 	 */
 	public function commit()
 	{
-	    $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
+	    $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST);
 	    $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionCommit($connent));
 		return $connent->commit();
 	}
@@ -53,7 +53,7 @@ class PDO extends \LSYS\Database {
 	 */
 	public function rollback()
 	{
-	    $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
+	    $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST);
 	    $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionRollback($connent));
 		return $connent->rollBack();
 	}
@@ -82,6 +82,6 @@ class PDO extends \LSYS\Database {
 	 * @see \LSYS\Database::inTransaction()
 	 */
 	public function inTransaction(){
-	    return $this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER)->inTransaction();
+	    return $this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST)->inTransaction();
 	}
 }

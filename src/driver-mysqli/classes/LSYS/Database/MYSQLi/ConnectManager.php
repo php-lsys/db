@@ -19,7 +19,9 @@ class ConnectManager  extends \LSYS\Database\ConnectManager implements ConnectRe
 	        if ($this->read_connection)return $this->read_connection;
 	        if ($this->master_connection)return $this->master_connection;
 	    }
-	    if ($this->query_mode==self::QUERY_AUTO&&$connect_type===self::CONNECT_SLAVE){//读数据库
+	    if (($this->query_mode==self::QUERY_AUTO&&$connect_type===self::CONNECT_SLAVE)
+	        ||($this->query_mode==self::QUERY_SLAVE&&in_array($connect_type, [self::CONNECT_SLAVE,self::CONNECT_MASTER_SUGGEST]))
+	        ){//读数据库
 	        if ($this->read_connection) return $this->read_connection;
 	        $config=$this->config->get("slave_connection",array());
 	        $config=$this->weightGetConfig($config);
@@ -49,7 +51,8 @@ class ConnectManager  extends \LSYS\Database\ConnectManager implements ConnectRe
 	                $this->read_connection=null;
 	            }
 	        break;
-	        case self::CONNECT_MASTER:
+	        case self::CONNECT_MASTER_MUST:
+	        case self::CONNECT_MASTER_SUGGEST:
 	            if(is_object($this->master_connection)){
 	                if($this->master_connection->ping())return true;
 	                @$this->master_connection->close();
@@ -145,7 +148,9 @@ class ConnectManager  extends \LSYS\Database\ConnectManager implements ConnectRe
 	    else return $this->schema['slave']??null;
 	}
 	public function createConnect($connect_type=self::CONNECT_SLAVE){
-	    if ($this->query_mode==self::QUERY_AUTO&&$connect_type===self::CONNECT_SLAVE){//读数据库
+	    if (($this->query_mode==self::QUERY_AUTO&&$connect_type===self::CONNECT_SLAVE)
+	        ||($this->query_mode==self::QUERY_SLAVE&&in_array($connect_type, [self::CONNECT_SLAVE,self::CONNECT_MASTER_SUGGEST]))
+	        ){//读数据库
 	        $config=$this->config->get("slave_connection",array());
 	        $config=$this->weightGetConfig($config);
 	        if(!empty($config))return $this->connectCreate($config);
