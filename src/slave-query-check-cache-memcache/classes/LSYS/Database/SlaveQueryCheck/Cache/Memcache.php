@@ -25,7 +25,7 @@ class Memcache implements Cache{
         $this->log=$log;
     }
     protected function memcache(){
-        if (!is_object($this->memcache))$this->memcache=\LSYS\Memcache\DI::get()->memcached();
+        if (!is_object($this->memcache))$this->memcache=\LSYS\Memcache\DI::get()->memcache();
         try{
             $this->memcache->configServers();
         }catch (\LSYS\Exception $e){
