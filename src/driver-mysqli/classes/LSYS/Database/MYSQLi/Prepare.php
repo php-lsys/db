@@ -192,7 +192,7 @@ class Prepare extends \LSYS\Database\Prepare{
 	        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlOk($this->sql,true));
 	        break;
 	    }
-	    $this->slave_check&&$this->slave_check->execNotify($connect_mgr->schema($this->connect),$this->sql);
+	    $this->slave_check&&$this->slave_check->execNotify($this,$this->connect);
 	    $this->affected_rows=$this->connect->affected_rows;
 	    $this->insert_id=$this->connect->insert_id;
 	    $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlEnd($this->sql,true));
