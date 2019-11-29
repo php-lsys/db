@@ -192,7 +192,7 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
      */
     public function exec($sql,array $value=[],array $value_type=[]){
         try{
-            return parent::query($sql,$value,$value_type);
+            return parent::exec($sql,$value,$value_type);
         }catch (Exception $e){//unlink connect reset transaction status
             if ($this->getConnectManager()->isUnConnect($e->getCode())) {
                 $this->in_transaction=false;
