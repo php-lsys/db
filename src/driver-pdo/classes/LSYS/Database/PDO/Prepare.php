@@ -179,9 +179,9 @@ class Prepare extends \LSYS\Database\Prepare{
             $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlOk($this->sql,true));
             break;
         }
-        $this->slave_check&&$this->slave_check->execNotify($this,$this->connect);
         $this->insert_id=$this->connect->lastInsertId();
         $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlEnd($this->sql,true));
+        $this->slave_check&&$this->slave_check->execNotify($this,$this->connect);
         return true;
     }
     public function query(){
