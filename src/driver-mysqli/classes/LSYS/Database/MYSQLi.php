@@ -107,8 +107,8 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
         $sql=strtr($sql,$param);
         $connect_mgr=$this->getConnectManager();
         while(true){
-            if(count($this->async))$conn=$connect_mgr->createConnect(ConnectManager::CONNECT_SLAVE);
-            else $conn=$connect_mgr->getConnect(ConnectManager::CONNECT_SLAVE);
+            if(count($this->async))$conn=$connect_mgr->createConnect($is_exec?ConnectManager::CONNECT_MASTER:ConnectManager::CONNECT_AUTO);
+            else $conn=$connect_mgr->getConnect($is_exec?ConnectManager::CONNECT_MASTER:ConnectManager::CONNECT_AUTO);
             $res=$conn->query($sql, MYSQLI_ASYNC);
             if($res===false){
                 if($connect_mgr instanceof ConnectRetry
