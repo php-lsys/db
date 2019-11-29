@@ -49,6 +49,6 @@ class SlaveQueryCheck{
             }
             $table=array_merge($table,$add);
         }
-        $this->cache->save($table);
+        return $this->cache->save($table);
     }
 }

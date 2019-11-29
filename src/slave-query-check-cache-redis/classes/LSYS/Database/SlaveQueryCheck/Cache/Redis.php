@@ -27,9 +27,8 @@ class Redis implements Cache{
     }
     public function save(array $table){
         $this->redis->configConnect();
-        foreach ($table as $v){
-            $this->redis->hSet($this->key,$v,time()+$this->delayed());
-        }
+        $data=array_combine($table, array_fill(0, count($table), time()+$this->delayed()));
+        return $this->redis->hmSet($this->key,$data);
     }
     public function delayed(){
         return $this->delayed;
