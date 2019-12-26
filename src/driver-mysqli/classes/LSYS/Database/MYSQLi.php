@@ -60,7 +60,8 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
             throw new Exception ($connent->error, $connent->errno  );
         }
         $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionBegin($connent));
-        $status = (bool) $connent->query('START TRANSACTION');
+        $status = (bool) @$connent->query('START TRANSACTION');
+        if (!$status) throw new Exception ($connent->error, $connent->errno  );
         $this->in_transaction=true;
         return $status;
     }
@@ -82,6 +83,7 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
 		
 		$this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionCommit($connent));
 		$status = (bool) $connent->query('COMMIT');
+		if (!$status) throw new Exception ($connent->error, $connent->errno  );
 		$this->in_transaction=false;
 		return $status;
     }
@@ -95,6 +97,13 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
         // Make sure the database is connected
         $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionRollback($connent));
         $status = (bool) $connent->query('ROLLBACK');
+        if (!$status){
+            if(in_array(intval($connent->errno), [2006,2013])&&strpos($connent->error, 'has gone away')!==false){
+                $this->in_transaction=false;
+                return true;
+            }
+            throw new Exception ($connent->error,$connent->errno);
+        }
         $this->in_transaction=false;
         return $status;
     }

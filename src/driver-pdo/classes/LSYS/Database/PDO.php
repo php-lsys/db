@@ -35,7 +35,9 @@ class PDO extends \LSYS\Database {
 	{
 		$connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST);
 		$this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionBegin($connent));
-		return $connent->beginTransaction();
+		$status=$connent->beginTransaction();
+		if (!$status)throw new Exception ($connent->errorInfo(),$connent->errorCode());
+		return $status;
 	}
 	/**
 	 * {@inheritDoc}
@@ -45,7 +47,9 @@ class PDO extends \LSYS\Database {
 	{
 	    $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST);
 	    $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionCommit($connent));
-		return $connent->commit();
+	    $status=@$connent->commit();
+	    if (!$status)throw new Exception ($connent->errorInfo(),$connent->errorCode());
+	    return $status;
 	}
 	/**
 	 * {@inheritDoc}
@@ -55,7 +59,9 @@ class PDO extends \LSYS\Database {
 	{
 	    $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST);
 	    $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionRollback($connent));
-		return $connent->rollBack();
+	    $status=$connent->rollBack();
+	    if (!$status)throw new Exception ($connent->errorInfo(),$connent->errorCode());
+		return $status;
 	}
 	public function quote($value,$value_type=null) {
 	    if(is_string($value)||is_numeric($value)){
