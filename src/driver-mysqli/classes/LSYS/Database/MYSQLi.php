@@ -53,15 +53,17 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
      */
     public function beginTransaction($mode = NULL)
     {
-        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
+        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST);
         // Make sure the database is connected
         if ($mode AND ! $connent->query( "SET TRANSACTION ISOLATION LEVEL $mode"))
         {
             throw new Exception ($connent->error, $connent->errno  );
         }
-        $this->in_transaction=true;
         $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionBegin($connent));
-        return (bool) $connent->query('START TRANSACTION');
+        $status = (bool) @$connent->query('START TRANSACTION');
+        if (!$status) throw new Exception ($connent->error, $connent->errno  );
+        $this->in_transaction=true;
+        return $status;
     }
     /**
      * {@inheritDoc}
@@ -76,11 +78,14 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
      */
     public function commit()
     {
-        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
+        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST);
         // Make sure the database is connected
-		$this->in_transaction=false;
+		
 		$this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionCommit($connent));
-		return (bool) $connent->query('COMMIT');
+		$status = (bool) $connent->query('COMMIT');
+		if (!$status) throw new Exception ($connent->error, $connent->errno  );
+		$this->in_transaction=false;
+		return $status;
     }
    /**
     * {@inheritDoc}
@@ -88,11 +93,19 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
     */
     public function rollback()
     {
-        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER);
+        $connent=$this->getConnectManager()->getConnect(ConnectManager::CONNECT_MASTER_MUST);
         // Make sure the database is connected
-        $this->in_transaction=false;
         $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionRollback($connent));
-        return (bool) $connent->query('ROLLBACK');
+        $status = (bool) $connent->query('ROLLBACK');
+        if (!$status){
+            if(in_array(intval($connent->errno), [2006,2013])&&strpos($connent->error, 'has gone away')!==false){
+                $this->in_transaction=false;
+                return true;
+            }
+            throw new Exception ($connent->error,$connent->errno);
+        }
+        $this->in_transaction=false;
+        return $status;
     }
     protected function asyncAdd($is_exec,$sql, array $value = [], array $value_type = []){
         $this->last_query = $sql;
@@ -103,8 +116,14 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
         $sql=strtr($sql,$param);
         $connect_mgr=$this->getConnectManager();
         while(true){
-            if(count($this->async))$conn=$connect_mgr->createConnect(ConnectManager::CONNECT_SLAVE);
-            else $conn=$connect_mgr->getConnect(ConnectManager::CONNECT_SLAVE);
+            if($is_exec)$conn_type=ConnectManager::CONNECT_MASTER_MUST;
+            else{
+                if($this->slave_check&&$this->slave_check->allowSlave($sql))$conn_type=ConnectManager::CONNECT_SLAVE;
+                else $conn_type=ConnectManager::CONNECT_MASTER_SUGGEST;
+            }
+            if(count($this->async)){
+                $conn=$connect_mgr->createConnect($conn_type);
+            }else $conn=$connect_mgr->getConnect($conn_type);
             $res=$conn->query($sql, MYSQLI_ASYNC);
             if($res===false){
                 if($connect_mgr instanceof ConnectRetry
@@ -155,4 +174,41 @@ class MYSQLi extends \LSYS\Database implements AsyncQuery {
         }
         return new AsyncResult($result,$aff_row,$insert);
     }
+    
+    /**
+     * Perform an SQL query of the given type.
+     *
+     * @param   integer  $type
+     * @param   string   $sql        SQL query
+     * @return  Result
+     */
+    public function query($sql,array $value=[],array $value_type=[]){
+        try{
+            return parent::query($sql,$value,$value_type);
+        }catch (Exception $e){//unlink connect reset transaction status
+            if ($this->getConnectManager()->isUnConnect($e->getCode())) {
+                $this->in_transaction=false;
+            }
+            throw $e;
+        }
+    }
+    /**
+     * Perform an SQL query of the given type.
+     *
+     * @param   integer  $type
+     * @param   string   $sql        SQL query
+     * @return  bool
+     */
+    public function exec($sql,array $value=[],array $value_type=[]){
+        try{
+            return parent::exec($sql,$value,$value_type);
+        }catch (Exception $e){//unlink connect reset transaction status
+            if ($this->getConnectManager()->isUnConnect($e->getCode())) {
+                $this->in_transaction=false;
+            }
+            throw $e;
+        }
+    }
+    
+    
 }

@@ -34,10 +34,14 @@ class SlaveQueryCheck{
      * @param string $table_schema 默认数据库名
      * @param string $sql
      */
-    public function execNotify($table_schema,$sql){
-        if($this->cache->delayed()<=0||!$sql)return;
+    public function execNotify(Prepare $prepare,$connect){
+        $sql=$prepare->lastQuery();
+        if($this->cache->delayed()<=0
+            ||$prepare->affectedRows()<=0
+            ||empty($sql))return;
         $table=$this->parse->execParseTable($sql);
         if(empty($table))return;
+        $table_schema=$prepare->db()->getConnectManager()->schema($connect);
         if(!empty($table_schema)){
             $add=[];
             foreach ($table as $v){
@@ -45,6 +49,6 @@ class SlaveQueryCheck{
             }
             $table=array_merge($table,$add);
         }
-        $this->cache->save($table);
+        return $this->cache->save($table);
     }
 }

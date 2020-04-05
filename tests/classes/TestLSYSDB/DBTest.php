@@ -190,14 +190,14 @@ class MYSQLITest extends TestCase
             ":title"=>"sntitle",
             ":add_time"=>time(),
         ]);
-        $sql="DELETE FROM {$table_name} where id=:id";
-        $db->exec($sql,[
-            ":id"=>"0",
-        ]);
         $sql="UPDATE {$table_name} as b join {$table_name} as b1 on b.id=b1.id SET b.title=:title WHERE b1.id=:id ";
         $db->exec($sql,[
-            ":id"=>"0",
+            ":id"=>$db->insertId(),
             ":title"=>"title",
+        ]);
+        $sql="DELETE FROM {$table_name} where id=:id";
+        $db->exec($sql,[
+            ":id"=>$db->insertId(),
         ]);
         $this->assertFalse($slave->allowSlave("select * from {$table_name}"));
         $this->assertFalse($slave->allowSlave("select * from temp as b join {$table_name} as bb on b.id=bb.id"));

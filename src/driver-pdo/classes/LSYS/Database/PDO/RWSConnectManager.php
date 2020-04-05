@@ -31,7 +31,9 @@ class RWSConnectManager extends ConnectManager {
 	        if ($this->read_connection)return $this->read_connection;
 	        if ($this->connection)return $this->connection;
 	    }
-	    if ($this->query_mode==self::QUERY_AUTO&&$connect_type===self::CONNECT_SLAVE){//读数据库
+	    if (($this->query_mode==self::QUERY_AUTO&&$connect_type===self::CONNECT_SLAVE)
+	        ||($this->query_mode==self::QUERY_SLAVE&&in_array($connect_type, [self::CONNECT_SLAVE,self::CONNECT_MASTER_SUGGEST]))
+            ){//读数据库
 	        if ($this->read_connection) return $this->read_connection;
 	        $config=$this->config->get("slave_connection",array());
 	        $config=$this->weightGetConfig($config);
@@ -49,7 +51,8 @@ class RWSConnectManager extends ConnectManager {
 	            if(is_object($this->connection))return true;
 	            if(is_object($this->read_connection))return true;
 	            break;
-	        case self::CONNECT_MASTER:
+	        case self::CONNECT_MASTER_MUST:
+	        case self::CONNECT_MASTER_SUGGEST:
 	            return parent::isConnected($connect_type);
 	            break;
 	        case self::CONNECT_SLAVE:

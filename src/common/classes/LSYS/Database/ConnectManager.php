@@ -18,17 +18,27 @@ abstract class ConnectManager {
      * @var integer
      */
     const QUERY_MASTER=1;
+    /**
+     * set MQL query to slave database [CONNECT_MASTER_SUGGEST]
+     * @var integer
+     */
+    const QUERY_SLAVE=2;
     
     /**
-     * 主或从连接都可以
+     * 返回一个可用连接,不管主从
      * @var integer
      */
     const CONNECT_AUTO=0;
     /**
-     * 必须是主库连接
+     * 建议选择主库连接
      * @var integer
      */
-    const CONNECT_MASTER=1;
+    const CONNECT_MASTER_SUGGEST=1;
+    /**
+     * 必须选择主库连接
+     * @var integer
+     */
+    const CONNECT_MASTER_MUST=1;
     /**
      * 如果有从库,得到从库连接
      * @var integer
