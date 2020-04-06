@@ -20,27 +20,27 @@
 		"files": ["src/common/Bootstarp.php"]
     },
     "require": {
-     	"lsys/i18n":"~2.0.0",
-     	"lsys/config":"~2.0.0"
+     	"lsys/i18n":"~0.0.0",
+     	"lsys/config":"~0.0.0"
 	},
 	"require-dev": {
-     	"lsys/profiler":"~2.0.0",
-     	"lsys/event":"~2.0.0",
+     	"lsys/profiler":"~0.0.0",
+     	"lsys/event":"~0.0.0",
      	"ext-mysqli":"*",
      	"ext-pdo":"*",
      	"phpunit/phpunit" : "~7.1.5",
      	"php-coveralls/php-coveralls":"~v2.0.0",
-     	"lsys/redis":"~2.0.0",
-     	"lsys/memcached":"~2.0.0",
-     	"lsys/memcache":"~2.0.0"
+     	"lsys/redis":"~0.0.0",
+     	"lsys/memcached":"~0.0.0",
+     	"lsys/memcache":"~0.0.0"
 	},
 	"suggest": {
-		"lsys/profiler":"~2.0.0",
-     	"lsys/event":"~2.0.0",
+		"lsys/profiler":"~0.0.0",
+     	"lsys/event":"~0.0.0",
      	"ext-mysqli":"*",
-     	"lsys/memcache":"~2.0.0",
-     	"lsys/memcached":"~2.0.0",
-     	"lsys/redis":"~2.0.0",
+     	"lsys/memcache":"~0.0.0",
+     	"lsys/memcached":"~0.0.0",
+     	"lsys/redis":"~0.0.0",
      	"ext-pdo":"*",
      	"ext-pdo_sqlite":"*",
      	"ext-pdo_mysql":"*",
