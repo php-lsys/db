@@ -23,7 +23,7 @@ class Exception extends \LSYS\Exception{
 	 * @param   Exception       $previous   Previous exception
 	 * @return  void
 	 */
-	public function __construct($message = "", $code = 0, \Exception $previous = NULL)
+	public function __construct(string $message = "", $code = 0, \Exception $previous = NULL)
 	{
 	    if (DIRECTORY_SEPARATOR === '\\'&&$this->_isGb2312($message)){
 	        if(PHP_SAPI!=='cli'||(PHP_SAPI==='cli'&&version_compare(PHP_VERSION,'7.0.0',">="))){
@@ -56,8 +56,8 @@ class Exception extends \LSYS\Exception{
 	 * @param string $sql
 	 * @return \LSYS\Database\Exception
 	 */
-	public function setErrorSql($sql){
-		if (Core::$environment!==Core::PRODUCT){
+	public function setErrorSql(string $sql){
+	    if (!Core::envIs(Core::PRODUCT)){
 			$this->message.=" [{$sql}]";
 		}
 		$this->error_sql=$sql;
@@ -67,7 +67,7 @@ class Exception extends \LSYS\Exception{
 	 * get error sql
 	 * @return string
 	 */
-	public function getErrorSql(){
+	public function getErrorSql():?string{
 		return $this->error_sql;
 	}
 }

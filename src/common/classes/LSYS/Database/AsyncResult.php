@@ -16,25 +16,30 @@ class AsyncResult{
         $this->insert_id=$insert_id;
     }
     /**
-     * result
-     * @param array||int $aysnc_index
-     * @return Result
+     * 得到异步结构
+     * @param array|int $aysnc_index
+     * @throws \LSYS\Database\Exception
+     * @return Result|bool|NULL
      */
     public function result($aysnc_index){
         if(is_array($aysnc_index)){
             $out=array();
             foreach ($aysnc_index as $index){
-                $out[]=$this->result($index);
+                $res=$this->result($index);
+                if ($res instanceof \Exception)throw $res;
+                $out[]=$res;
             }
             return $out;
         }
-        return $this->result[$aysnc_index-1]??null;
+        $res=$this->result[$aysnc_index-1]??null;
+        if ($res instanceof \Exception)throw $res;
+        return $res;
     }
     /**
      * return last query affected rows
      * @return int
      */
-    public function affectedRows($aysnc_index){
+    public function affectedRows($aysnc_index):int{
         if(is_array($aysnc_index)){
             $out=array();
             foreach ($aysnc_index as $index){
@@ -48,7 +53,7 @@ class AsyncResult{
      * return last insert auto id
      * @return int
      */
-    public function insertId($aysnc_index){
+    public function insertId($aysnc_index):?int{
         if(is_array($aysnc_index)){
             $out=array();
             foreach ($aysnc_index as $index){
@@ -56,6 +61,6 @@ class AsyncResult{
             }
             return $out;
         }
-        return $this->insert_id[$aysnc_index-1]??false;
+        return $this->insert_id[$aysnc_index-1]??null;
     }
 }

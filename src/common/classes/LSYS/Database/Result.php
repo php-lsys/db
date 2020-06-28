@@ -32,10 +32,10 @@ abstract class Result implements \Iterator,\Countable{
 	/**
 	 * set fetch data mode
 	 * @param int $mode
-	 * @param string $classname
+	 * @param string|object $classname
 	 * @param array $ctorargs
 	 */
-	public function setFetchMode( $mode,$classname=NULL, array $ctorargs=NULL){
+	public function setFetchMode(int $mode,$classname=NULL,array $ctorargs=NULL){
 		switch ($mode){
 			case self::FETCH_ASSOC:
 				$this->as_object=false;
@@ -77,7 +77,7 @@ abstract class Result implements \Iterator,\Countable{
 	 * @param   string  $value  column for values
 	 * @return  array
 	 */
-	public function asArray($key = NULL, $value = NULL)
+	public function asArray(?string $key = NULL, ?string $value = NULL):array
 	{
 		$results = array();
 
@@ -163,7 +163,7 @@ abstract class Result implements \Iterator,\Countable{
 	 * @param   mixed   $default  default value if the column does not exist
 	 * @return  mixed
 	 */
-	public function get($name, $default = NULL)
+	public function get(string $name, $default = NULL)
 	{
 		$row = $this->current();
 
@@ -183,9 +183,14 @@ abstract class Result implements \Iterator,\Countable{
 	/**
 	 * next query result
 	 */
-	abstract public function nextRowset();
+	abstract public function nextRowset():bool;
 	/**
 	 * fetch num
 	 */
-	abstract public function count ();
+	abstract public function count ():int;
+	/**
+	 * get result from connect
+	 * @return ConnectSlave
+	 */
+	abstract public function connect();
 }

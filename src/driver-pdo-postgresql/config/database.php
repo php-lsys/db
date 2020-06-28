@@ -14,7 +14,7 @@ return array(
 		"table_prefix"=>"",
 		"connection"=>array(
 			//单数据库使用此配置
-			'dsn'        => 'mysql:host=127.0.0.1;dbname=tt;',
+			'dsn'        => 'pgsql:host=127.0.0.1;dbname=tt;',
 			'username'   => 'postgres',
 			'password'   => "123456",
 			'schema'   => "why",
@@ -25,7 +25,7 @@ return array(
 	    //读写分离中只读数据库
 	    'slave_connection'=>array(
 	        array(
-	            'dsn'        => 'mysql:host=127.0.0.1;dbname=lsys;',
+	            'dsn'        => 'pgsql:host=127.0.0.1;dbname=lsys;',
 	            'username'   => 'root',
 	            'password'   => "110",
 	            'weight'	 => 1,

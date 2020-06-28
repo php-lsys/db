@@ -8,10 +8,9 @@
 namespace LSYS\Database;
 interface ConnectRetry{
 	/**
-	 * return is retry connect
-	 * @param mixed $connect connect object
+	 * 返回是否可重新连接
 	 * @param mixed $error_object error object
 	 * @return bool
 	 */
-    public function isReConnect($connect,$error_info);
+    public function isReConnect($error_info):bool;
 }

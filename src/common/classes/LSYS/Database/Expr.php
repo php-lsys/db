@@ -23,7 +23,7 @@ class Expr implements \JsonSerializable{
 	 * @param   array   $parameters unquoted parameter values
 	 * @return  void
 	 */
-	public function __construct($value, $parameters = array())
+	public function __construct(string $value, array $parameters = array())
 	{
 		// Set the expression string
 		$this->value = $value;
@@ -49,9 +49,9 @@ class Expr implements \JsonSerializable{
 	 *
 	 * @return  string
 	 */
-	public function value()
+	public function value():string
 	{
-		return (string) $this->value;
+		return $this->value;
 	}
 	
 	/**
@@ -74,7 +74,7 @@ class Expr implements \JsonSerializable{
 	 * @param   mixed    Database instance or name of instance
 	 * @return  string
 	 */
-	public function compile($db=NULL)
+	public function compile($db=NULL):string
 	{
 		if ( ! is_object($db))
 		{

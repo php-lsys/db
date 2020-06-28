@@ -30,9 +30,7 @@
      	"ext-pdo":"*",
      	"phpunit/phpunit" : "~7.1.5",
      	"php-coveralls/php-coveralls":"~v2.0.0",
-     	"lsys/redis":"~0.0.1",
-     	"lsys/memcached":"~0.0.1",
-     	"lsys/memcache":"~0.0.1"
+     	"lsys/redis":"~0.0.1"
 	},
 	"suggest": {
 		"lsys/profiler":"~0.0.1",
