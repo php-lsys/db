@@ -8,6 +8,7 @@
 namespace LSYS;
 use LSYS\Database\ConnectMaster;
 use LSYS\Database\ConnectSlave;
+use function LSYS\Database\__ as __;
 abstract class Database{
 	/**
 	 * 创建一个SQL表达式
@@ -101,7 +102,7 @@ abstract class Database{
 	}
 	/**
 	 * 返回一个连接
-	 * 不管主从,未连接时创建从库连接并返回
+	 * 不管主从,未连接时调用getSlaveConnect创建连接并返回
 	 * @return ConnectSlave|ConnectMaster
 	 */
 	abstract public function getConnect();
@@ -111,7 +112,7 @@ abstract class Database{
 	 */
 	abstract public function getMasterConnect():ConnectMaster;
 	/**
-	 * 返回一个从库连接
+	 * 返回一个从库连接,当从库不可用时返回主库连接
 	 * @return ConnectSlave
 	 */
 	abstract public function getSlaveConnect():ConnectSlave;

@@ -79,7 +79,7 @@ class Expr implements \JsonSerializable{
 		if ( ! is_object($db))
 		{
 			// Get the database instance
-		    $db = \LSYS\Database\DI::get()->db();
+		    $db = \LSYS\Database\DI::get()->db()->getConnect();
 		}
 	
 		$value = $this->value();
@@ -97,7 +97,7 @@ class Expr implements \JsonSerializable{
 	}
     public function jsonSerialize()
     {
-        $db = \LSYS\Database\DI::get()->db();
+        $db = \LSYS\Database\DI::get()->db()->getConnect();
         $value = $this->value();
         if ( ! empty($this->parameters))
         {

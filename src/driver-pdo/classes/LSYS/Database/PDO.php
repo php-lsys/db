@@ -67,8 +67,7 @@ class PDO extends \LSYS\Database {
 	/**
 	 * 创建连接
 	 * @param array $link_config
-	 * @throws Exception
-	 * @return \mysqli
+	 * @return PDOConnect
 	 */
 	protected function connectCreate(array $link_config){
 	    return new PDOConnect($this,$this->config,$link_config,$this->event_manager);

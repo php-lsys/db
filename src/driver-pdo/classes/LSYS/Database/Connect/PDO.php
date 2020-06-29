@@ -6,9 +6,9 @@
  * @license    http://www.apache.org/licenses/LICENSE-2.0
  */
 namespace LSYS\Database\Connect;
-use LSYS\Database\Exception;
 use LSYS\Database\EventManager\DBEvent;
 use LSYS\Database\ConnectRetry;
+use LSYS\Database\PDOException;
 class PDO extends \LSYS\Database\ConnectMaster {
 	// PDO uses no quoting for identifiers
 	protected $identifier = '';
@@ -42,7 +42,7 @@ class PDO extends \LSYS\Database\ConnectMaster {
 	    }
 	    return is_object($this->connection);
 	}
-	public function escape(?string $value):?string
+	public function escape($value):?string
 	{
 	    $this->connect();
 	    $value=$this->connection->quote($value);
@@ -52,8 +52,8 @@ class PDO extends \LSYS\Database\ConnectMaster {
 	/**
 	 * 创建一个连接
 	 * @param array $link_config
-	 * @throws Exception
-	 * @return \mysqli
+	 * @throws PDOException
+	 * @return \PDO
 	 */
 	protected function connectCreate(){
 	    /**
@@ -83,7 +83,7 @@ class PDO extends \LSYS\Database\ConnectMaster {
 		}
 		catch (\PDOException $e)
 		{
-			throw new Exception($e->getMessage(),$e->getCode(),$e);
+			throw new PDOException($e->getMessage(),$e->getCode(),$e);
 		}
 		return $connent;
 	}
@@ -124,7 +124,7 @@ class PDO extends \LSYS\Database\ConnectMaster {
 	                    continue;
 	                }
                 $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionFail($connent));
-                throw new Exception ($connent->errorInfo(),$connent->errorCode());
+                throw new PDOException ($connent->errorInfo(),$connent->errorCode());
 	        }
 	        break;
 	    }
@@ -136,7 +136,7 @@ class PDO extends \LSYS\Database\ConnectMaster {
 	    $connent=$this->connection;
 	    $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionCommit($connent));
 	    $status=@$connent->commit();
-	    if (!$status)throw new Exception ($connent->errorInfo(),$connent->errorCode());
+	    if (!$status)throw new PDOException ($connent->errorInfo(),$connent->errorCode());
 	    return $status;
 	}
 	public function rollback():bool
@@ -145,11 +145,11 @@ class PDO extends \LSYS\Database\ConnectMaster {
 	    $connent=$this->connection;
 	    $this->event_manager&&$this->event_manager->dispatch(DBEvent::transactionRollback($connent));
 	    $status=$connent->rollBack();
-	    if (!$status)throw new Exception ($connent->errorInfo(),$connent->errorCode());
+	    if (!$status)throw new PDOException ($connent->errorInfo(),$connent->errorCode());
 	    return $status;
 	}
 	public function inTransaction():bool{
-	    if (is_object($this->connection))return false;
-	    return $this->connection->inTransaction();
+	    if (!is_object($this->connection))return false;
+	    return (bool)$this->connection->inTransaction();
 	}
 }

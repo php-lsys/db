@@ -108,7 +108,7 @@ class MYSQLi extends \LSYS\Database implements AsyncMaster{
     protected function asyncAdd(MysqliConnect $connect,bool $is_exec,string $sql, array $value = [], array $value_type = []):int{
         $param=[];
         foreach ($value as $k=>$v){
-            $param[$k]=$this->quote($v,$value_type[$k]??null);
+            $param[$k]=$this->getConnect()->quote($v,$value_type[$k]??null);
         }
         $sql=strtr($sql,$param);
         while(true){
@@ -169,7 +169,17 @@ class MYSQLi extends \LSYS\Database implements AsyncMaster{
                 $_ins=$mysqlconnect->insert_id;
                 $_result=$sql_result;
             }else{
-                $_result=new \LSYS\Database\Connect\MYSQLi\Result($sql_result);
+                $more_result=null;
+                if($mysqlconnect->more_results()){
+                    $more_result=function()use($mysqlconnect){
+                        if(!$mysqlconnect->next_result()){
+                            $mysqlconnect->close();
+                            return ;
+                        }
+                        return $mysqlconnect->store_result();
+                    };
+                }
+                $_result=new \LSYS\Database\Connect\MYSQLi\Result($sql_result,$more_result);
                 $_aff_row=0;
                 $_ins=0;
             }
@@ -177,7 +187,9 @@ class MYSQLi extends \LSYS\Database implements AsyncMaster{
             $result[$k]=$_result;
             $aff_row[$k]=$_aff_row;
             $insert[$k]=$_ins;
-            @$mysqlconnect->close();
+            if (!$mysqlconnect->more_results()) {
+                @$mysqlconnect->close();
+            }
         }
         return new AsyncResult($result,$aff_row,$insert);
     }

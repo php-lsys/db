@@ -9,6 +9,9 @@ use LSYS\EventManager\EventCallback;
 use LSYS\Database\EventManager\DBEvent;
 use LSYS\Database\EventManager\ProfilerObserver;
 use LSYS\Database\AsyncMaster;
+use LSYS\Database\PrepareSlave;
+use LSYS\Database\ConnectSchema;
+use LSYS\Database\ConnectCharset;
 class MYSQLITest extends TestCase
 {
     public function testinit(){
@@ -59,14 +62,13 @@ class MYSQLITest extends TestCase
         $this->runCURD(DI::get()->db("database.pdo_mysql"));
     }
     protected function runCURD(Database $db) {
-        
         \LSYS\EventManager\DI::get()->eventManager()->attach(new EventCallback([
             DBEvent::SQL_START,
             DBEvent::SQL_END,
             DBEvent::SQL_OK,
             DBEvent::SQL_END,
         ], function(\LSYS\EventManager\Event $e){
-            $this->assertTrue(!empty($e->data("sql")));
+            $this->assertTrue($e->data("prepare") instanceof PrepareSlave);
         }));
         \LSYS\EventManager\DI::get()->eventManager()->attach(new EventCallback([
             DBEvent::TRANSACTION_BEGIN,
@@ -87,10 +89,10 @@ class MYSQLITest extends TestCase
         $sql="insert into {$table_name} ({$column},{$titlec},{$add_time}) values ({$val},{$title},{$time});";
         $result=$db->getMasterConnect()->exec($sql);
         $this->assertTrue($result);
-        $this->assertEquals($db->getConnect()->lastQuery(), $sql);
-        $id=$db->getConnect()->insertId();
+        $this->assertEquals($db->getMasterConnect()->lastQuery(), $sql);
+        $id=$db->getMasterConnect()->insertId();
         $this->assertTrue(is_numeric($id));
-        $row=$db->getConnect()->affectedRows();
+        $row=$db->getMasterConnect()->affectedRows();
         $this->assertTrue(is_numeric($row));
         $_id=$db->getConnect()->quote($id);
         $res=$db->getConnect()->query("select * from {$table_name} where id={$_id}");
@@ -136,27 +138,34 @@ class MYSQLITest extends TestCase
         $res=$db->getSlaveConnect()->query($tsql);
         $this->assertEquals($res->count(), "0");
         
+        $conn=$db->getMasterConnect();
+        if ($conn instanceof ConnectSchema) {
+            $conn->useSchema('test');
+            $this->assertEquals('test', $conn->schema());
+        }
+        $conn=$db->getMasterConnect();
+        if ($conn instanceof ConnectCharset) {
+            $conn->setCharset('utf8');
+            $this->assertEquals('utf8', $conn->charset());
+        }
         
         //异步
         if ($db instanceof AsyncMaster) {
-            $i1=$db->asyncQuery("select * from {$table_name} where id={$bid}");
-            $i2=$db->asyncQuery("select * from {$table_name} where id={$_id}");
+            $i1=$db->asyncQuery($db->getMasterConnect(),"select * from {$table_name} where id={$bid}");
+            $i2=$db->asyncQuery($db->getMasterConnect(),"select * from {$table_name} where id={$_id}");
             $data=$db->asyncExecute()->result([$i1,$i2]);
             $this->assertTrue(is_array($data));
             $this->assertEquals($data[0]->get("id"),$bid);
             $this->assertEquals($data[1]->get("id"),$_id);
-            
-            $i1=$db->asyncExec($sql);
-            $i2=$db->asyncQuery("select * from {$table_name} where id=:id",[":id"=>$id]);
+            $i1=$db->asyncExec($db->getMasterConnect(),$sql);
+            $i2=$db->asyncQuery($db->getConnect(),"select * from {$table_name} where id=:id",[":id"=>$id]);
             $res=$db->asyncExecute();
             $data=$res->result([$i1,$i2]);
             $this->assertTrue($res->insertId($i1)>0);
             $this->assertTrue($res->affectedRows($i1)>0);
             $this->assertTrue($data[0]);
             $this->assertEquals($data[1]->get("id"),$_id);
-            
         }
-        
         
         $dsql="delete from {$table_name} where id=:id";
         $result=$db->getMasterConnect()->exec($dsql,array(":id"=>$idd));

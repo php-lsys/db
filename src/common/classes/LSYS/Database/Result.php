@@ -188,9 +188,4 @@ abstract class Result implements \Iterator,\Countable{
 	 * fetch num
 	 */
 	abstract public function count ():int;
-	/**
-	 * get result from connect
-	 * @return ConnectSlave
-	 */
-	abstract public function connect();
 }

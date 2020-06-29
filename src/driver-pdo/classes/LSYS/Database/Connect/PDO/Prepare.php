@@ -6,9 +6,9 @@
  * @license    http://www.apache.org/licenses/LICENSE-2.0
  */
 namespace LSYS\Database\Connect\PDO;
-use LSYS\Database\Exception;
 use LSYS\Database\ConnectRetry;
 use LSYS\Database\EventManager\DBEvent;
+use LSYS\Database\PDOException;
 /**
  * @property \LSYS\Database\Connect\PDO $connect
  */
@@ -107,14 +107,14 @@ class Prepare extends \LSYS\Database\PrepareMaster{
                     $this->connect->disConnect();
                     continue;
                 }
-                throw (new Exception($e->getMessage(),$e->getCode(),$e))->setErrorSql($this->query_sql);
+                throw (new PDOException($e->getMessage(),$e->getCode(),$e))->setErrorSql($this->query_sql);
             }
             if($result===false){
                 if ($this->reConnect($connect)) {
                     $this->connect->disConnect();
                     continue;
                 }
-                throw (new Exception($connect->errorInfo(),$connect->errorCode()))->setErrorSql($this->query_sql);
+                throw (new PDOException($connect->errorInfo(),$connect->errorCode()))->setErrorSql($this->query_sql);
             }
             break;
         }
@@ -134,7 +134,7 @@ class Prepare extends \LSYS\Database\PrepareMaster{
             $value=strval($value);
         }
         if(!$this->prepare->bindValue($key,$value,$attr)){
-            throw new Exception($this->prepare->errorInfo(),$this->prepare->errorCode());
+            throw new PDOException($this->prepare->errorInfo(),$this->prepare->errorCode());
         }
     }
     protected function bindValues(){
@@ -156,7 +156,7 @@ class Prepare extends \LSYS\Database\PrepareMaster{
     }
     public function query(){
         $this->querySql();
-        return new Result($this->connect,$this->prepare);
+        return new Result($this->prepare);
     }
     protected function querySql(){
         $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this,true));
@@ -172,7 +172,7 @@ class Prepare extends \LSYS\Database\PrepareMaster{
                     continue;
                 }
                 $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this,true));
-                throw (new Exception($e->getMessage(), $e->getCode()))->setErrorSql($this->query_sql);
+                throw (new PDOException($e->getMessage(), $e->getCode()))->setErrorSql($this->query_sql);
             }
             if(!$exec){
                 $connect=$this->connect->link();
@@ -182,7 +182,7 @@ class Prepare extends \LSYS\Database\PrepareMaster{
                     continue;
                 }
                 $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this,true));
-                throw (new Exception(json_encode($connect->errorInfo(),JSON_UNESCAPED_UNICODE), $connect->errorCode()))->setErrorSql($this->query_sql);
+                throw (new PDOException(json_encode($connect->errorInfo(),JSON_UNESCAPED_UNICODE), $connect->errorCode()))->setErrorSql($this->query_sql);
             }
             $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlOk($this,true));
             break;

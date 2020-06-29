@@ -248,7 +248,7 @@ class MYSQLi extends \LSYS\Database\ConnectMaster implements ConnectRetry,Connec
      * @see \LSYS\Database\ConnectMaster::inTransaction()
      */
     public function inTransaction():bool{
-    	return $this->in_transaction;
+        return boolval($this->in_transaction);
     }
     /**
      * {@inheritDoc}
@@ -320,7 +320,7 @@ class MYSQLi extends \LSYS\Database\ConnectMaster implements ConnectRetry,Connec
     * @see \LSYS\Database\ConnectRetry::isReConnect()
     */
     public function isReConnect($error_info):bool{
-        if (is_object($this->connection))return false;
+        if (!is_object($this->connection))return false;
         if($this->isUnConnect($this->connection->errno)){
             $try_re_num=$this->config->get("try_re_num",0);
             if($try_re_num==0)return false;

@@ -29,7 +29,7 @@ return array(
 	),
     "pdo_mysql"=>array(
         //PDO MYSQL 配置
-        "type"=>\LSYS\Database\PDO\MYSQL::class,
+        "type"=>\LSYS\Database\MYSQLPDO::class,
         "charset"=>"UTF8",
         "table_prefix"=>"l_",
         "try_re_num"=>"2",

@@ -26,14 +26,10 @@ class Result extends \LSYS\Database\Result{
 	 * @param mixed $result
 	 * @param string $sql
 	 */
-	public function __construct(\LSYS\Database\Connect\PDO $connect,$result)
+	public function __construct($result)
 	{
-	    $this->connect=$connect;
 	    $this->result=$result;
 	    $this->total_rows = $this->result->rowCount();
-	}
-	public function connect(){
-	    return $this->connect;
 	}
 	public function setFetchMode($mode,$classname=NULL, array $ctorargs=NULL){
 	    parent::setFetchMode($mode,$classname,$ctorargs);

@@ -141,7 +141,7 @@ class Prepare extends \LSYS\Database\PrepareMaster{
      */
     public function query(){
         $this->querySql();
-        return new Result($this->connect,$this->prepare->get_result(),function(){
+        return new Result($this->prepare->get_result(),function(){
             $this->prepare->next_result();
             return $this->prepare->get_result();
         });
@@ -180,14 +180,14 @@ class Prepare extends \LSYS\Database\PrepareMaster{
 	 * @return int
 	 */
 	public function affectedRows():int{
-	    return $this->connect->link()->affected_rows;
+	    return $this->prepare?$this->prepare->affected_rows:0;
 	}
 	/**
 	 * return last insert auto id
 	 * @return int
 	 */
 	public function insertId():?int{
-	    return $this->connect->link()->insert_id;
+	    return $this->prepare?$this->prepare->insert_id:null;
 	}
 	/**
 	 * return last query database sql

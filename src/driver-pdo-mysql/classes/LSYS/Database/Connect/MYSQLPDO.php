@@ -6,11 +6,11 @@
  * @license    http://www.apache.org/licenses/LICENSE-2.0
  */
 namespace LSYS\Database\Connect;
-use LSYS\Database\Exception;
 use LSYS\Database\ConnectCharset;
 use LSYS\Database\ConnectRetry;
 use LSYS\Database\ConnectSchema;
 use LSYS\EventManager;
+use LSYS\Database\PDOException;
 class MYSQLPDO extends \LSYS\Database\Connect\PDO implements ConnectCharset,ConnectRetry,ConnectSchema {
     /**
      * 默认数据库
@@ -48,7 +48,7 @@ class MYSQLPDO extends \LSYS\Database\Connect\PDO implements ConnectCharset,Conn
                 }else{
                     $errno=$connect->errorCode();
                     $msg=is_array($connect->errorInfo())?array_pop($connect->errorInfo()):'';
-                    throw (new Exception($msg,$errno))->setErrorSql($sql);
+                    throw (new PDOException($msg,$errno))->setErrorSql($sql);
                 }
             }
             break;
@@ -63,8 +63,7 @@ class MYSQLPDO extends \LSYS\Database\Connect\PDO implements ConnectCharset,Conn
         while(true){
             $this->connect();
             $connect=$this->connection;
-            $charset=$connect->quote($charset);
-            $sql='SET NAMES '.$charset;
+            $sql='SET NAMES '.$connect->quote($charset);
             if($connect->exec($sql)===false){
                 if($this->isReConnect($connect)){
                     $this->disConnect();
@@ -72,7 +71,7 @@ class MYSQLPDO extends \LSYS\Database\Connect\PDO implements ConnectCharset,Conn
                 }else{
                     $errno=$connect->errorCode();
                     $msg=is_array($connect->errorInfo())?array_pop($connect->errorInfo()):'';
-                    throw (new Exception($msg,$errno))->setErrorSql($sql);
+                    throw (new PDOException($msg,$errno))->setErrorSql($sql);
                 }
             }
             $this->charset=$charset;
@@ -100,7 +99,7 @@ class MYSQLPDO extends \LSYS\Database\Connect\PDO implements ConnectCharset,Conn
         while(true){
             $this->connect();
             $connect=$this->connection;
-            $sql="use ".$connect->quote($dbname);
+            $sql="use {$dbname}";
             if($connect->exec($sql)===false){
                 if($this->isReConnect($connect)){
                     $this->disConnect();
@@ -108,7 +107,7 @@ class MYSQLPDO extends \LSYS\Database\Connect\PDO implements ConnectCharset,Conn
                 }else{
                     $errno=$connect->errorCode();
                     $msg=is_array($connect->errorInfo())?array_pop($connect->errorInfo()):'';
-                    throw (new Exception($msg,$errno))->setErrorSql($sql);
+                    throw (new PDOException($msg,$errno))->setErrorSql($sql);
                 }
             }
             $this->link_config['dsn']=preg_replace("/dbname\s*=\s*([^;]+)(.*)$/", "/dbname={$dbname};$2/", $this->link_config['dsn']??'');
@@ -119,8 +118,8 @@ class MYSQLPDO extends \LSYS\Database\Connect\PDO implements ConnectCharset,Conn
     }
     public function isReConnect($error_info):bool
     {
-        if($error_info instanceof \Exception ){
-            $errno=$error_info->getCode();
+        if($error_info instanceof PDOException){
+            $errno=$error_info->getPdoErrorCode();
             $msg=$error_info->getMessage();
         }else if($error_info instanceof \PDO){
             $errno=$error_info->errorCode();
@@ -128,7 +127,7 @@ class MYSQLPDO extends \LSYS\Database\Connect\PDO implements ConnectCharset,Conn
         }else return false;
         switch ($errno){
             case 'HY000':
-                if(in_array(intval($errno), [2006,2013])&&strpos($msg, 'has gone away')!==false){
+                if(strpos($msg, '2006')||strpos($msg, '2013')){
                     $try_re_num=$this->config->get("try_re_num",0);
                     if($try_re_num==0)return false;
                     if($this->try_num<$try_re_num){

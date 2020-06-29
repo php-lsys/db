@@ -15,7 +15,6 @@ class MYSQLPDO extends \LSYS\Database\PDO{
     /**
      * 创建连接
      * @param array $link_config
-     * @throws Exception
      * @return MYSQLPDOConnect
      */
     protected function connectCreate(array $link_config){

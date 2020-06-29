@@ -27,14 +27,14 @@ class Database implements Config{
 		$name=trim($name);
 		$this->_name=$name;
 		$this->_db=$db;
-		$db=$db->getSlaveConnect();
+		$conn=$db->getSlaveConnect();
 		$this->_table=$table;
 		// id name value
 		$len=strlen($name);
-		$name=$db->quote($name.'%');
-		$table=$db->quoteTable($table);
+		$name=$conn->quote($name.'%');
+		$table=$conn->quoteTable($table);
 		$sql="select name,value from {$table} where name like {$name}";
-		$row=$db->query($sql);
+		$row=$conn->query($sql);
 		$this->_load=count($row)>0;
 		foreach ($row as $v){
 			$_name=substr($v['name'],$len+1);

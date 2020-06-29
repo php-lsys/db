@@ -6,7 +6,7 @@
  */
 namespace LSYS\Database\EventManager;
 use LSYS\EventManager\Event;
-use LSYS\Database\Connect\MYSQLi\Prepare;
+use LSYS\Database\PrepareSlave;
 class DBEvent extends Event
 {
     const SQL_START="db.sql.start";
@@ -17,16 +17,16 @@ class DBEvent extends Event
     const TRANSACTION_COMMIT="db.transaction.commit";
     const TRANSACTION_ROLLBACK="db.transaction.rollback";
     const TRANSACTION_FAIL="db.transaction.fail";
-    public static function sqlStart(Prepare $prepare,string $sql,bool $exec) {
+    public static function sqlStart(PrepareSlave $prepare,bool $exec) {
         return new self(self::SQL_START,compact(func_get_argsname()));
     }
-    public static function sqlOk(Prepare $prepare,string $sql,bool $exec) {
+    public static function sqlOk(PrepareSlave $prepare,bool $exec) {
         return new self(self::SQL_OK,compact(func_get_argsname()));
     }
-    public static function sqlBad(Prepare $prepare,string $sql,bool $exec) {
+    public static function sqlBad(PrepareSlave $prepare,bool $exec) {
         return new self(self::SQL_BAD,compact(func_get_argsname()));
     }
-    public static function sqlEnd(Prepare $prepare,string $sql,bool $exec) {
+    public static function sqlEnd(PrepareSlave $prepare,bool $exec) {
         return new self(self::SQL_END,compact(func_get_argsname()));
     }
     public static function transactionBegin($connent) {

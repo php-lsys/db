@@ -6,9 +6,9 @@
  * @license    http://www.apache.org/licenses/LICENSE-2.0
  */
 namespace LSYS\Database\Connect;
-use LSYS\Database\Exception;
 use LSYS\Database\ConnectCharset;
 use LSYS\EventManager;
+use LSYS\Database\PDOException;
 class PostgrePDO extends \LSYS\Database\Connect\PDO implements ConnectCharset {
     protected $identifier = '';
     /**
@@ -32,7 +32,7 @@ class PostgrePDO extends \LSYS\Database\Connect\PDO implements ConnectCharset {
         if($connect->exec($sql)===false){
             $errno=$connect->errorCode();
             $msg=is_array($connect->errorInfo())?array_pop($connect->errorInfo()):'';
-            throw (new Exception($msg,$errno))->setErrorSql($sql);
+            throw (new PDOException($msg,$errno))->setErrorSql($sql);
         }
         $this->charset=$charset;
         return true;

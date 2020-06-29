@@ -14,14 +14,10 @@ class Result extends \LSYS\Database\Result{
 	protected $result;
 	protected $connect;
 	protected $index=0;
-	public function __construct(\LSYS\Database\Connect\MYSQLi $connect,$result,$next_result=null)
+	public function __construct($result,$next_result=null)
 	{
-	    $this->connect=$connect;
 	    $this->result=$result;
 	    $this->next_result=$next_result;
-	}
-	public function connect(){
-	    return $this->connect;
 	}
 	public function current()
 	{

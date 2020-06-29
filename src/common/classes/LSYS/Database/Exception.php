@@ -23,7 +23,7 @@ class Exception extends \LSYS\Exception{
 	 * @param   Exception       $previous   Previous exception
 	 * @return  void
 	 */
-	public function __construct(string $message = "", $code = 0, \Exception $previous = NULL)
+	public function __construct(string $message, ?int $code = null, \Exception $previous = NULL)
 	{
 	    if (DIRECTORY_SEPARATOR === '\\'&&$this->_isGb2312($message)){
 	        if(PHP_SAPI!=='cli'||(PHP_SAPI==='cli'&&version_compare(PHP_VERSION,'7.0.0',">="))){
