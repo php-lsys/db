@@ -11,10 +11,7 @@
         		"src/driver-mysqli/classes/LSYS/",
         		"src/driver-pdo/classes/LSYS/",
         		"src/driver-pdo-mysql/classes/LSYS/",
-        		"src/driver-pdo-postgresql/classes/LSYS/",
-        		"src/slave-query-check-cache-memcache/classes/LSYS/",
-        		"src/slave-query-check-cache-memcached/classes/LSYS/",
-        		"src/slave-query-check-cache-redis/classes/LSYS/"
+        		"src/driver-pdo-postgresql/classes/LSYS/"
         	]
 		},
 		"files": ["src/common/Bootstarp.php"]
