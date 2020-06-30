@@ -35,7 +35,7 @@ class Prepare extends \LSYS\Database\PrepareMaster{
                         continue;
                     }
                     if($v instanceof \LSYS\Database\Expr){
-                        $v=$v->compile($this->connect->db());
+                        $v=$v->compile($this->connect);
                         $sql=substr_replace($sql, $v,$p,1);
                         $irm[]=$k;
                     }
@@ -52,7 +52,7 @@ class Prepare extends \LSYS\Database\PrepareMaster{
             }
             if ($v instanceof \LSYS\Database\Expr) {
                 //解析表达式对象
-                $v=$v->compile($this->connect->db());
+                $v=$v->compile($this->connect);
                 $sql=strtr($sql,[$k=>$v]);
                 unset($this->value[$k]);
             }
@@ -150,15 +150,15 @@ class Prepare extends \LSYS\Database\PrepareMaster{
         &&$connect->isReConnect($error_info);
     }
     public function exec():bool{
-        $this->querySql();
+        $this->execSql();
         $this->insert_id=$this->connect->link()->lastInsertId();
         return true;
     }
     public function query(){
-        $this->querySql();
+        $this->execSql();
         return new Result($this->prepare);
     }
-    protected function querySql(){
+    protected function execSql(){
         $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this,true));
         while(true){
             $this->prepareCreate();
@@ -188,10 +188,6 @@ class Prepare extends \LSYS\Database\PrepareMaster{
             break;
         }
         $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlEnd($this,true));
-    }
-    public function lastQuery():?string{
-        if (!$this->prepare) return null;
-        return strval($this->prepare->queryString);
     }
     public function affectedRows():int{
         return $this->prepare?$this->prepare->rowCount():0;

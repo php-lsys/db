@@ -56,7 +56,7 @@ abstract class ConnectSlave{
 	 * @return string
 	 */
 	public function lastQuery():?string {
-	    return $this->last_prepare?$this->last_prepare->lastQuery():null;
+	    return $this->last_prepare?$this->last_prepare->querySQL():null;
 	}
 	/**
 	 * 包裹值

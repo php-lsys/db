@@ -29,7 +29,7 @@ class Prepare extends \LSYS\Database\PrepareMaster{
                 $index[]=$p;
                 $val[$p]=$k;
                 if ($v instanceof \LSYS\Database\Expr) {
-                    $v=$v->compile($this->connect->db());
+                    $v=$v->compile($this->connect);
                     $index_expr[$p]=$v;
                     array_pop($val);
                 }
@@ -46,7 +46,7 @@ class Prepare extends \LSYS\Database\PrepareMaster{
                 $fill[$k]="(".implode(",", array_fill(0, count($v), "?")).")";
             }else{
                 if ($v instanceof \LSYS\Database\Expr) {
-                    $v=$v->compile($this->connect->db());
+                    $v=$v->compile($this->connect);
                     $fill[$k]=$v;
                     array_pop($val);
                 }else{
@@ -140,7 +140,7 @@ class Prepare extends \LSYS\Database\PrepareMaster{
      * @see \LSYS\Database\PrepareSlave::query()
      */
     public function query(){
-        $this->querySql();
+        $this->execSql();
         return new Result($this->prepare->get_result(),function(){
             $this->prepare->next_result();
             return $this->prepare->get_result();
@@ -151,10 +151,10 @@ class Prepare extends \LSYS\Database\PrepareMaster{
 	 * @see \LSYS\Database\PrepareMaster::exec()
 	 */
     public function exec():bool{
-        $this->querySql();
+        $this->execSql();
 	    return true;
 	}
-	protected function querySql() {
+	protected function execSql() {
 	    while(true){
 	        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this,false));
 	        $this->prepareCreate();
@@ -188,14 +188,6 @@ class Prepare extends \LSYS\Database\PrepareMaster{
 	 */
 	public function insertId():?int{
 	    return $this->prepare?$this->prepare->insert_id:null;
-	}
-	/**
-	 * return last query database sql
-	 * @return string
-	 */
-	public function lastQuery():?string{
-	    if (!$this->prepare)return null;
-	    return $this->sql.(count($this->value)?" -- ".json_encode($this->value,JSON_UNESCAPED_UNICODE):"");
 	}
 	/**
 	 * free result

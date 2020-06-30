@@ -71,15 +71,15 @@ class Expr implements \JsonSerializable{
 	 * Compile the SQL expression and return it. Replaces any parameters with
 	 * their given values.
 	 *
-	 * @param   mixed    Database instance or name of instance
+	 * @param   ConnectSlave    Database instance or name of instance
 	 * @return  string
 	 */
-	public function compile($db=NULL):string
+	public function compile($connect=NULL):string
 	{
-		if ( ! is_object($db))
+	    if ( ! is_object($connect))
 		{
 			// Get the database instance
-		    $db = \LSYS\Database\DI::get()->db()->getConnect();
+		    $connect = \LSYS\Database\DI::get()->db()->getConnect();
 		}
 	
 		$value = $this->value();
@@ -87,7 +87,7 @@ class Expr implements \JsonSerializable{
 		if ( ! empty($this->parameters))
 		{
 			// Quote all of the parameter values
-			$params = array_map(array($db, 'quote'), $this->parameters);
+		    $params = array_map(array($connect, 'quote'), $this->parameters);
 	
 			// Replace the values in the expression
 			$value = strtr($value, $params);

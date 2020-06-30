@@ -32,10 +32,12 @@ abstract class PrepareSlave{
         return $this->connect;
     }
     /**
-     * return last query database sql
+     * return request sql data
      * @return string
      */
-    abstract public function lastQuery():?string;
+    public function querySQL():string{
+        return $this->sql.(count($this->value)?" -- ".json_encode($this->value,JSON_UNESCAPED_UNICODE):"");
+    }
     /**
      * bind data to sql
      * @param array $value
