@@ -80,7 +80,7 @@ class Database implements Config{
 	 * {@inheritDoc}
 	 * @see \LSYS\Config::get()
 	 */
-	public function exist($key):bool{
+	public function exist(string $key):bool{
 		$group= explode('.', $key);
 		$t=$this->_node;
 		while (count($group)){
