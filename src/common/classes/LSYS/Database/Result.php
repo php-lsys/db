@@ -79,6 +79,8 @@ abstract class Result implements \Iterator,\Countable{
 	 */
 	public function asArray(?string $key = NULL, ?string $value = NULL):array
 	{
+	    $keep_key=$this->key();
+	    $this->rewind();
 		$results = array();
 
 		if ($key === NULL AND $value === NULL)
@@ -149,7 +151,10 @@ abstract class Result implements \Iterator,\Countable{
 		}
 
 		$this->rewind();
-
+		while (true) {
+		    if(!$this->valid()||$this->key()==$keep_key)break;
+		    $this->next();
+		}
 		return $results;
 	}
 
