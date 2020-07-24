@@ -140,7 +140,7 @@ class Prepare extends \LSYS\Database\PrepareMaster{
      * @see \LSYS\Database\PrepareSlave::query()
      */
     public function query(){
-        $this->execSql();
+        $this->execSql(false);
         return new Result($this->prepare->get_result(),function(){
             $this->prepare->next_result();
             return $this->prepare->get_result();
@@ -151,16 +151,16 @@ class Prepare extends \LSYS\Database\PrepareMaster{
 	 * @see \LSYS\Database\PrepareMaster::exec()
 	 */
     public function exec():bool{
-        $this->execSql();
+        $this->execSql(true);
 	    return true;
 	}
-	protected function execSql() {
+	protected function execSql($exec) {
 	    while(true){
-	        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this,false));
+	        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this,$exec));
 	        $this->prepareCreate();
 	        $this->bindValue();
 	        if(!@$this->prepare->execute()){
-	            $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this,false));
+	            $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this,$exec));
 	            if($this->reConnect()){
 	                $this->prepare=null;
 	                $this->connect->disConnect();
@@ -170,10 +170,10 @@ class Prepare extends \LSYS\Database\PrepareMaster{
 	                throw (new Exception($native_connect->error, $native_connect->errno))->setErrorSql($this->query_sql);
 	            }
 	        }
-	        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlOk($this,false));
+	        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlOk($this,$exec));
 	        break;
 	    }
-	    $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlEnd($this,false));
+	    $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlEnd($this,$exec));
 	}
 	/**
 	 * return last query affected rows

@@ -150,16 +150,16 @@ class Prepare extends \LSYS\Database\PrepareMaster{
         &&$connect->isReConnect($error_info);
     }
     public function exec():bool{
-        $this->execSql();
+        $this->execSql(true);
         $this->insert_id=$this->connect->link()->lastInsertId();
         return true;
     }
     public function query(){
-        $this->execSql();
+        $this->execSql(false);
         return new Result($this->prepare);
     }
-    protected function execSql(){
-        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this,true));
+    protected function execSql($exec){
+        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlStart($this,$exec));
         while(true){
             $this->prepareCreate();
             try{
@@ -171,7 +171,7 @@ class Prepare extends \LSYS\Database\PrepareMaster{
                     $this->connect->disConnect();
                     continue;
                 }
-                $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this,true));
+                $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this,$exec));
                 throw (new PDOException($e->getMessage(), $e->getCode()))->setErrorSql($this->query_sql);
             }
             if(!$exec){
@@ -181,13 +181,13 @@ class Prepare extends \LSYS\Database\PrepareMaster{
                     $this->connect->disConnect();
                     continue;
                 }
-                $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this,true));
+                $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlBad($this,$exec));
                 throw (new PDOException(json_encode($connect->errorInfo(),JSON_UNESCAPED_UNICODE), $connect->errorCode()))->setErrorSql($this->query_sql);
             }
-            $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlOk($this,true));
+            $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlOk($this,$exec));
             break;
         }
-        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlEnd($this,true));
+        $this->event_manager&&$this->event_manager->dispatch(DBEvent::sqlEnd($this,$exec));
     }
     public function affectedRows():int{
         return $this->prepare?$this->prepare->rowCount():0;
