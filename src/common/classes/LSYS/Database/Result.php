@@ -66,90 +66,18 @@ abstract class Result implements \Iterator,\Countable{
 	 *
 	 *     // Indexed array of all rows
 	 *     $rows = $result->asArray();
-	 *
-	 *     // Associative array of rows by "id"
-	 *     $rows = $result->asArray('id');
-	 *
-	 *     // Associative array of rows, "id" => "name"
-	 *     $rows = $result->asArray('id', 'name');
-	 *
-	 * @param   string  $key    column for associative keys
-	 * @param   string  $value  column for values
+	 *     
 	 * @return  array
 	 */
-	public function asArray(?string $key = NULL, ?string $value = NULL):array
+	public function asArray():array
 	{
 	    $keep_key=$this->key();
 	    $this->rewind();
 		$results = array();
-
-		if ($key === NULL AND $value === NULL)
+		foreach ($this as $row)
 		{
-			// Indexed rows
-
-			foreach ($this as $row)
-			{
-				$results[] = $row;
-			}
+			$results[] = $row;
 		}
-		elseif ($key === NULL)
-		{
-			// Indexed columns
-
-			if ($this->as_object)
-			{
-				foreach ($this as $row)
-				{
-					$results[] = $row->$value;
-				}
-			}
-			else
-			{
-				foreach ($this as $row)
-				{
-					$results[] = $row[$value];
-				}
-			}
-		}
-		elseif ($value === NULL)
-		{
-			// Associative rows
-
-			if ($this->as_object)
-			{
-				foreach ($this as $row)
-				{
-					$results[$row->$key] = $row;
-				}
-			}
-			else
-			{
-				foreach ($this as $row)
-				{
-					$results[$row[$key]] = $row;
-				}
-			}
-		}
-		else
-		{
-			// Associative columns
-
-			if ($this->as_object)
-			{
-				foreach ($this as $row)
-				{
-					$results[$row->$key] = $row->$value;
-				}
-			}
-			else
-			{
-				foreach ($this as $row)
-				{
-					$results[$row[$key]] = $row[$value];
-				}
-			}
-		}
-
 		$this->rewind();
 		while (true) {
 		    if(!$this->valid()||$this->key()==$keep_key)break;
