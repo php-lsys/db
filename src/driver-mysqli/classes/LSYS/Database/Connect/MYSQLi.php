@@ -182,7 +182,7 @@ class MYSQLi extends \LSYS\Database\ConnectMaster implements ConnectRetry,Connec
 	        }
 	        if (! empty ($this->charset)){
 	            if($connection->set_charset($this->charset)===false){
-	                if($this->isUnConnect($connection->errno))continue;
+	                if($this->isUnConnect($connection))continue;
 	                throw new Exception($connection->error,$connection->errno);
 	            }
 	        }
@@ -193,7 +193,7 @@ class MYSQLi extends \LSYS\Database\ConnectMaster implements ConnectRetry,Connec
 	                $_variables [] = 'SESSION ' . $var . ' = ' . $this->quote ( $val );
 	            }
 	            if($connection->query('SET ' . implode ( ', ', $_variables ))===false){
-	                if($this->isUnConnect($connection->errno))continue;
+	                if($this->isUnConnect($connection))continue;
 	                throw new Exception($connection->error,$connection->errno);
 	            }
 	        }
@@ -294,7 +294,7 @@ class MYSQLi extends \LSYS\Database\ConnectMaster implements ConnectRetry,Connec
         try{
             return parent::query($sql,$value,$value_type);
         }catch (Exception $e){//unlink connect reset transaction status
-            if ($this->isUnConnect($e->getCode())) {
+            if ($this->isUnConnectException($e)) {
                 $this->in_transaction=false;
             }
             throw $e;
@@ -309,7 +309,7 @@ class MYSQLi extends \LSYS\Database\ConnectMaster implements ConnectRetry,Connec
         try{
             return parent::exec($sql,$value,$value_type);
         }catch (Exception $e){//unlink connect reset transaction status
-            if ($this->isUnConnect($e->getCode())) {
+            if ($this->isUnConnectException($e)) {
                 $this->in_transaction=false;
             }
             throw $e;
@@ -321,7 +321,7 @@ class MYSQLi extends \LSYS\Database\ConnectMaster implements ConnectRetry,Connec
     */
     public function isReConnect($error_info):bool{
         if (!is_object($this->connection))return false;
-        if($this->isUnConnect($this->connection->errno)){
+        if($this->isUnConnect($this->connection)){
             $try_re_num=$this->config->get("try_re_num",0);
             if($try_re_num==0)return false;
             if($this->try_num<$try_re_num){
@@ -341,8 +341,19 @@ class MYSQLi extends \LSYS\Database\ConnectMaster implements ConnectRetry,Connec
      * @param object $error_object
      * @return boolean
      */
-    protected function isUnConnect($errno):bool{
-        return $errno == 2006||$errno == 2013;
+    protected function isUnConnectException(\Exception $e):bool{
+        $code=strval($e->getCode());
+        if ($code=='2006'||$code=='2013') {
+            if(strpos($e->getMessage(), 'has gone away')!==false)return true;
+        }
+        return false;
+    }
+    protected function isUnConnect(\mysqli $conn):bool{
+        if (strval($conn->errno)=='2006'||strval($conn->errno)=='2013')return true;
+        if (strval($conn->connect_errno)=='2006' or strval($conn->connect_errno)=='2013' ) {
+            if (strpos($conn->connect_error, 'has gone away')!==false)return true;
+        }
+        return false;
     }
     /**
      * {@inheritDoc}
