@@ -18,7 +18,8 @@ class ProfilerObserver implements EventObserver
     {
         switch ($event->getName()) {
             case DBEvent::SQL_START:
-                $this->token = $this->profiler->start("Database",$event->data("prepare")->querySQL());
+                list($prepare)=$event->getData();
+                $this->token = $this->profiler->start("Database",$prepare->querySQL());
                 break;
             case DBEvent::SQL_OK:
                 if($this->token){
